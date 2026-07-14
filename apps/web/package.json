@@ -1,0 +1,43 @@
+{
+  "name": "@codesync/web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src/**/*.{ts,tsx}",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@codesync/config": "*",
+    "@codesync/types": "*",
+    "@codesync/ui": "*",
+    "@codesync/utils": "*",
+    "@codesync/validators": "*",
+    "@tanstack/react-query": "^5.45.0",
+    "axios": "^1.7.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.51.5",
+    "react-router-dom": "^6.23.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@codesync/eslint-config": "*",
+    "@codesync/tsconfig": "*",
+    "@tailwindcss/vite": "^4.0.0",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.5.0",
+    "jsdom": "^24.1.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1",
+    "vitest": "^1.6.0"
+  }
+}
