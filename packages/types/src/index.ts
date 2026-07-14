@@ -14,7 +14,10 @@ export interface User {
   createdAt: string;
 }
 
-export type UserRole = "member" | "admin";
+export enum UserRole {
+  MEMBER = "member",
+  ADMIN = "admin",
+}
 
 export interface UserResponseDTO {
   id: string;

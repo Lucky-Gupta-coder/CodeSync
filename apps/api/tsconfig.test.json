@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": ".",
+    "allowJs": true,
     "baseUrl": ".",
     "paths": {
       "@codesync/types": ["../../packages/types/src/index.ts"],

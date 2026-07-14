@@ -1,11 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { UserRole } from "@codesync/types";
 
 export interface IUser extends Document {
   name: string;
   email: string;
   passwordHash: string;
   avatar: string;
-  role: "member" | "admin";
+  role: UserRole;
   isVerified: boolean;
   lastLogin: Date | null;
   createdAt: Date;
@@ -17,9 +18,9 @@ const UserSchema = new Schema<IUser>(
     name: {
       type: String,
       required: [true, "Name is required"],
-      trim: true,
       minlength: [3, "Name must be at least 3 characters"],
       maxlength: [50, "Name must not exceed 50 characters"],
+      trim: true,
     },
     email: {
       type: String,
@@ -40,8 +41,8 @@ const UserSchema = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: ["member", "admin"],
-      default: "member",
+      enum: Object.values(UserRole),
+      default: UserRole.MEMBER,
     },
     isVerified: {
       type: Boolean,

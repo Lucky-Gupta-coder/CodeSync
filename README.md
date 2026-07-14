@@ -91,6 +91,18 @@ The services will be available at:
   - Slim Controller/Service registration flows
   - Jest & Supertest Integration Tests
 
+### Sprint 1.2A: Backend Authentication
+
+- **Status**: Completed
+- **Features**:
+  - Secure Login with credentials verification using Argon2
+  - Modern JWT signing and verification using `jose` library
+  - Authentication middleware checking Bearer headers
+  - Declaration merging for typed Express requests context (`req.user`)
+  - Whitelist-based role authorization guard foundation (`authorize`)
+  - User session endpoints (`GET /api/auth/me`)
+  - Jest & Supertest authentication integration test coverage
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

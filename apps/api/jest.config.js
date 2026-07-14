@@ -2,7 +2,7 @@ export default {
   preset: "ts-jest/presets/default-esm",
   testEnvironment: "node",
   transform: {
-    "^.+\\.tsx?$": [
+    "^.+\\.[tj]sx?$": [
       "ts-jest",
       {
         useESM: true,
@@ -10,6 +10,7 @@ export default {
       },
     ],
   },
+  transformIgnorePatterns: ["node_modules/(?!jose/)"],
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1",
     "^@codesync/types$": "<rootDir>/../../packages/types/src/index.ts",
