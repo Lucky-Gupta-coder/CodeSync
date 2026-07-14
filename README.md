@@ -79,6 +79,18 @@ The services will be available at:
 - Backend API: `http://localhost:5000`
 - MongoDB: `mongodb://localhost:27017/codesync`
 
+## Sprint Progress
+
+### Sprint 1.1: Authentication Registration
+
+- **Status**: Completed
+- **Features**:
+  - Secure User Model Mongoose Schema
+  - Argon2 Password Encryption
+  - Zod Registration Request Validation
+  - Slim Controller/Service registration flows
+  - Jest & Supertest Integration Tests
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

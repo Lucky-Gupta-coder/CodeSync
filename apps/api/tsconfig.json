@@ -2,14 +2,7 @@
   "extends": "@codesync/tsconfig/node.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "@codesync/types": ["../../packages/types/src/index.ts"],
-      "@codesync/validators": ["../../packages/validators/src/index.ts"],
-      "@codesync/utils": ["../../packages/utils/src/index.ts"],
-      "@codesync/config": ["../../packages/config/src/index.ts"]
-    }
+    "outDir": "dist"
   },
-  "include": ["src/**/*", "tests/**/*"]
+  "include": ["src/**/*"]
 }

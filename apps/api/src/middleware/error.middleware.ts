@@ -12,16 +12,24 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ): void => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
+  const isZodError = err.name === "ZodError" || err instanceof ZodError;
+  const statusCode = isZodError ? 400 : err.statusCode || 500;
+  const message = isZodError ? "Validation Error" : err.message || "Internal Server Error";
 
-  logger.error(`[${req.method}] ${req.originalUrl} - Status: ${statusCode} - Message: ${message}`);
+  if (statusCode >= 500) {
+    logger.error(
+      `[${req.method}] ${req.originalUrl} - Status: ${statusCode} - Message: ${message}`
+    );
+  } else {
+    logger.warn(`[${req.method}] ${req.originalUrl} - Status: ${statusCode} - Message: ${message}`);
+  }
 
-  if (err instanceof ZodError) {
+  if (isZodError) {
+    const zodError = err as ZodError;
     res.status(400).json({
-      status: "error",
+      success: false,
       message: "Validation Error",
-      errors: err.errors.map((e) => ({
+      errors: zodError.errors.map((e) => ({
         path: e.path.join("."),
         message: e.message,
       })),
@@ -30,7 +38,7 @@ export const errorHandler = (
   }
 
   res.status(statusCode).json({
-    status: "error",
+    success: false,
     message:
       process.env.NODE_ENV === "production" && statusCode === 500
         ? "An unexpected error occurred"

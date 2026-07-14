@@ -13,3 +13,24 @@ export interface User {
   email: string;
   createdAt: string;
 }
+
+export type UserRole = "member" | "admin";
+
+export interface UserResponseDTO {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+}
+
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password?: string;
+}
+
+export interface RegisterResponse {
+  success: boolean;
+  message: string;
+  data: UserResponseDTO;
+}

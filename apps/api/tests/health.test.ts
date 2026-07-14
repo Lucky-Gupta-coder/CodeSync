@@ -5,10 +5,13 @@ import { jest } from "@jest/globals";
 
 // Mock mongoose library directly
 jest.mock("mongoose", () => {
+  const actualMongoose = jest.requireActual("mongoose") as any;
   return {
+    ...actualMongoose,
     connect: (jest.fn() as any).mockResolvedValue(null as any),
     disconnect: (jest.fn() as any).mockResolvedValue(null as any),
     connection: {
+      ...actualMongoose.connection,
       readyState: 1, // Default to connected (1)
       on: jest.fn(),
     },
