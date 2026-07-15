@@ -103,6 +103,19 @@ The services will be available at:
   - User session endpoints (`GET /api/auth/me`)
   - Jest & Supertest authentication integration test coverage
 
+### Sprint 1.2B: Frontend Authentication
+
+- **Status**: Completed
+- **Features**:
+  - Centered modern dark theme glassmorphism Login screen (`LoginPage` & `LoginForm`)
+  - Form validation powered by `React Hook Form` and `Zod` schemas
+  - Centralized global state management using `Zustand` auth store
+  - Secure path guarding via declarative `<ProtectedRoute>` components
+  - Dynamic `Axios` request interceptor attaching Authorization headers
+  - TanStack Query hooks integration (`useLogin` and `useCurrentUser` with reactive `useEffect` store syncing)
+  - Layout structures and session loaders (`AuthLayout` & `AuthProvider`)
+  - Vitest + React Testing Library integration test suite coverage
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
