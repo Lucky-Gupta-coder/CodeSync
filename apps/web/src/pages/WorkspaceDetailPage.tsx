@@ -1,10 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { workspaceApi } from "../modules/workspace/services/workspace.service.js";
 import { roomApi } from "../modules/room/services/room.service.js";
 import { RoomLanguage, RoomStatus, WorkspaceVisibility } from "@codesync/types";
-import { RoomCreateSchema } from "@codesync/validators";
+import { RoomCreateSchema, WorkspaceCreateSchema } from "@codesync/validators";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,17 +16,24 @@ import { Modal } from "../components/common/Modal.js";
 import { Dialog } from "../components/common/Dialog.js";
 import { EmptyState } from "../components/common/EmptyState.js";
 import { Skeleton } from "../components/common/Skeleton.js";
+import { useAuthStore } from "../modules/auth/store/auth.store.js";
+import { useToastStore } from "../store/toast.store.js";
 
 type CreateRoomInput = z.input<typeof RoomCreateSchema>;
+type EditWorkspaceInput = z.input<typeof WorkspaceCreateSchema>;
 
 export const WorkspaceDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
+  const addToast = useToastStore((state) => state.addToast);
 
   const [isOpenRoomModal, setIsOpenRoomModal] = useState(false);
+  const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false);
   const [isOpenArchiveDialog, setIsOpenArchiveDialog] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   // Fetch workspace details
   const {
@@ -51,10 +58,39 @@ export const WorkspaceDetailPage = () => {
   const createRoomMutation = useMutation({
     mutationFn: (data: { name: string; description?: string; language: RoomLanguage }) =>
       roomApi.createRoom(id || "", data),
-    onSuccess: () => {
+    onSuccess: (newRoom) => {
       queryClient.invalidateQueries({ queryKey: ["rooms", id] });
       setIsOpenRoomModal(false);
       resetRoomForm();
+      addToast(`Coding room "${newRoom.name}" created successfully`, "success");
+    },
+    onError: (err: unknown) => {
+      const msg =
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message ||
+        "Failed to create room";
+      addToast(msg, "error");
+    },
+  });
+
+  // Edit workspace mutation
+  const editMutation = useMutation({
+    mutationFn: (data: EditWorkspaceInput) =>
+      workspaceApi.updateWorkspace(id || "", {
+        name: data.name,
+        description: data.description || "",
+        visibility: data.visibility || WorkspaceVisibility.PRIVATE,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workspace", id] });
+      queryClient.invalidateQueries({ queryKey: ["workspaces-list"] });
+      setIsOpenEditModal(false);
+      addToast(`Workspace details updated successfully`, "success");
+    },
+    onError: (err: unknown) => {
+      const msg =
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message ||
+        "Failed to update workspace";
+      addToast(msg, "error");
     },
   });
 
@@ -66,9 +102,22 @@ export const WorkspaceDetailPage = () => {
         ? workspaceApi.restoreWorkspace(id || "")
         : workspaceApi.archiveWorkspace(id || "");
     },
-    onSuccess: () => {
+    onSuccess: (updatedWs) => {
       queryClient.invalidateQueries({ queryKey: ["workspace", id] });
+      queryClient.invalidateQueries({ queryKey: ["workspaces-list"] });
       setIsOpenArchiveDialog(false);
+      addToast(
+        updatedWs.isArchived
+          ? "Workspace archived and made read-only"
+          : "Workspace restored successfully",
+        "success"
+      );
+    },
+    onError: (err: unknown) => {
+      const msg =
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message ||
+        "Operation failed";
+      addToast(msg, "error");
     },
   });
 
@@ -76,7 +125,15 @@ export const WorkspaceDetailPage = () => {
   const deleteMutation = useMutation({
     mutationFn: () => workspaceApi.deleteWorkspace(id || ""),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workspaces-list"] });
+      addToast("Workspace deleted successfully", "success");
       navigate("/workspaces");
+    },
+    onError: (err: unknown) => {
+      const msg =
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message ||
+        "Failed to delete workspace";
+      addToast(msg, "error");
     },
   });
 
@@ -94,6 +151,26 @@ export const WorkspaceDetailPage = () => {
     },
   });
 
+  const {
+    register: registerEdit,
+    handleSubmit: handleSubmitEdit,
+    reset: resetEditForm,
+    formState: { errors: editErrors },
+  } = useForm<EditWorkspaceInput>({
+    resolver: zodResolver(WorkspaceCreateSchema),
+  });
+
+  // Populate edit form defaults
+  useEffect(() => {
+    if (workspace) {
+      resetEditForm({
+        name: workspace.name,
+        description: workspace.description || "",
+        visibility: workspace.visibility,
+      });
+    }
+  }, [workspace, resetEditForm]);
+
   const onRoomSubmit = (fields: CreateRoomInput) => {
     createRoomMutation.mutate({
       name: fields.name,
@@ -102,14 +179,16 @@ export const WorkspaceDetailPage = () => {
     });
   };
 
+  const onEditSubmit = (fields: EditWorkspaceInput) => {
+    editMutation.mutate(fields);
+  };
+
   if (!id) {
     return <div className="text-slate-400">Workspace ID is missing.</div>;
   }
 
-  // Error redirect to unauthorized or not found
   if (workspaceError) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const status = (workspaceError as any).response?.status;
+    const status = (workspaceError as { response?: { status?: number } }).response?.status;
     if (status === 403) {
       navigate("/unauthorized", { replace: true });
     } else {
@@ -119,6 +198,7 @@ export const WorkspaceDetailPage = () => {
   }
 
   const isLoading = isLoadingWorkspace || isLoadingRooms;
+  const isOwner = workspace && user && String(workspace.owner) === String(user.id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -138,22 +218,27 @@ export const WorkspaceDetailPage = () => {
                 >
                   {workspace.visibility}
                 </Badge>
-                {workspace.isArchived && <Badge variant="danger">Archived</Badge>}
+                {workspace.isArchived && <Badge variant="warning">Archived</Badge>}
               </div>
               <p className="text-sm text-slate-400 max-w-xl leading-relaxed">
                 {workspace.description || "No description provided."}
               </p>
             </div>
 
-            {/* Quick Actions */}
-            <div className="flex items-center gap-3 shrink-0">
-              <Button variant="outline" size="sm" onClick={() => setIsOpenArchiveDialog(true)}>
-                {workspace.isArchived ? "Restore Workspace" : "Archive"}
-              </Button>
-              <Button variant="danger" size="sm" onClick={() => setIsOpenDeleteDialog(true)}>
-                Delete
-              </Button>
-            </div>
+            {/* Quick Actions (Restricted to OWNER) */}
+            {isOwner && (
+              <div className="flex items-center gap-3 shrink-0">
+                <Button variant="outline" size="sm" onClick={() => setIsOpenEditModal(true)}>
+                  Edit
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setIsOpenArchiveDialog(true)}>
+                  {workspace.isArchived ? "Restore" : "Archive"}
+                </Button>
+                <Button variant="danger" size="sm" onClick={() => setIsOpenDeleteDialog(true)}>
+                  Delete
+                </Button>
+              </div>
+            )}
           </div>
         </Card>
       ) : null}
@@ -286,6 +371,54 @@ export const WorkspaceDetailPage = () => {
         </form>
       </Modal>
 
+      {/* Edit Workspace Modal */}
+      <Modal
+        isOpen={isOpenEditModal}
+        onClose={() => setIsOpenEditModal(false)}
+        title="Edit Workspace"
+      >
+        <form onSubmit={handleSubmitEdit(onEditSubmit)} className="flex flex-col gap-4">
+          <Input
+            label="Workspace Name"
+            placeholder="e.g. project-x"
+            error={editErrors.name?.message}
+            {...registerEdit("name")}
+          />
+          <Input
+            label="Description"
+            placeholder="A description of this project workspace"
+            error={editErrors.description?.message}
+            {...registerEdit("description")}
+          />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-slate-400 tracking-wide uppercase">
+              Visibility
+            </label>
+            <select
+              className="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer"
+              {...registerEdit("visibility")}
+            >
+              <option value={WorkspaceVisibility.PRIVATE}>Private (Invite Only)</option>
+              <option value={WorkspaceVisibility.PUBLIC}>Public (Read-Only to Guests)</option>
+            </select>
+          </div>
+
+          <div className="flex justify-end gap-3 mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={() => setIsOpenEditModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button size="sm" type="submit" loading={editMutation.isPending}>
+              Save Changes
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
       {/* Archive Dialogue */}
       <Dialog
         isOpen={isOpenArchiveDialog}
@@ -301,17 +434,51 @@ export const WorkspaceDetailPage = () => {
         loading={archiveMutation.isPending}
       />
 
-      {/* Delete Dialogue */}
-      <Dialog
+      {/* Delete Workspace Modal with Typing Safety */}
+      <Modal
         isOpen={isOpenDeleteDialog}
-        onClose={() => setIsOpenDeleteDialog(false)}
-        onConfirm={() => deleteMutation.mutate()}
+        onClose={() => {
+          setIsOpenDeleteDialog(false);
+          setDeleteConfirmText("");
+        }}
         title="Delete Workspace?"
-        message="Are you sure you want to delete this workspace? This operation is permanent, and will cascade-delete all coding rooms and memberships inside it."
-        confirmText="Delete"
-        variant="danger"
-        loading={deleteMutation.isPending}
-      />
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-sm text-slate-400">
+            This operation is permanent and will cascade-delete all coding rooms and memberships.
+          </p>
+          <p className="text-xs text-red-400 font-semibold bg-red-500/5 border border-red-500/10 p-3.5 rounded-lg leading-relaxed">
+            Please type <span className="font-bold underline select-all">{workspace?.name}</span> to
+            confirm.
+          </p>
+          <Input
+            placeholder="Type workspace name here"
+            value={deleteConfirmText}
+            onChange={(e) => setDeleteConfirmText(e.target.value)}
+          />
+          <div className="flex justify-end gap-3 mt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsOpenDeleteDialog(false);
+                setDeleteConfirmText("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              disabled={deleteConfirmText !== workspace?.name}
+              loading={deleteMutation.isPending}
+              onClick={() => deleteMutation.mutate()}
+            >
+              Delete Workspace
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

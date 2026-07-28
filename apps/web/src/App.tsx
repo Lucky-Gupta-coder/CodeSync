@@ -14,6 +14,7 @@ import { ProtectedRoute } from "./modules/auth/components/ProtectedRoute.js";
 import { AuthProvider } from "./modules/auth/components/AuthProvider.js";
 import { DashboardLayout } from "./layouts/DashboardLayout.js";
 import { ErrorBoundary } from "./components/common/ErrorBoundary.js";
+import { ToastContainer } from "./components/common/ToastContainer.js";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -88,6 +89,7 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <RouterProvider router={router} />
+          <ToastContainer />
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
