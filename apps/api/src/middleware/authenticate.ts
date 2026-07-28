@@ -12,6 +12,9 @@ declare global {
   namespace Express {
     interface Request {
       user?: UserResponseDTO;
+      workspace?: import("../modules/workspace/workspace.model.js").IWorkspace | null;
+      workspaceRole?: import("@codesync/types").MembershipRole | null;
+      membership?: import("../modules/workspace/membership.model.js").IMembership | null;
     }
   }
 }

@@ -6,6 +6,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@codesync/types": "*",
     "zod": "^3.23.8"
   }
 }

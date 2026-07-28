@@ -43,3 +43,66 @@ export const LoginSchema = z.object({
 });
 
 export type LoginInput = z.infer<typeof LoginSchema>;
+
+import { WorkspaceVisibility, RoomLanguage, RoomStatus } from "@codesync/types";
+
+export const WorkspaceCreateSchema = z.object({
+  name: z
+    .string({ required_error: "Workspace name is required" })
+    .trim()
+    .min(3, "Workspace name must be at least 3 characters")
+    .max(50, "Workspace name must not exceed 50 characters"),
+  description: z
+    .string()
+    .trim()
+    .max(200, "Description must not exceed 200 characters")
+    .default("")
+    .optional(),
+  visibility: z.nativeEnum(WorkspaceVisibility).default(WorkspaceVisibility.PRIVATE),
+});
+
+export type WorkspaceCreateInput = z.infer<typeof WorkspaceCreateSchema>;
+
+export const WorkspaceUpdateSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, "Workspace name must be at least 3 characters")
+    .max(50, "Workspace name must not exceed 50 characters")
+    .optional(),
+  description: z.string().trim().max(200, "Description must not exceed 200 characters").optional(),
+  visibility: z.nativeEnum(WorkspaceVisibility).optional(),
+});
+
+export type WorkspaceUpdateInput = z.infer<typeof WorkspaceUpdateSchema>;
+
+export const RoomCreateSchema = z.object({
+  name: z
+    .string({ required_error: "Room name is required" })
+    .trim()
+    .min(3, "Room name must be at least 3 characters")
+    .max(50, "Room name must not exceed 50 characters"),
+  description: z
+    .string()
+    .trim()
+    .max(200, "Description must not exceed 200 characters")
+    .default("")
+    .optional(),
+  language: z.nativeEnum(RoomLanguage).default(RoomLanguage.JAVASCRIPT),
+});
+
+export type RoomCreateInput = z.infer<typeof RoomCreateSchema>;
+
+export const RoomUpdateSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, "Room name must be at least 3 characters")
+    .max(50, "Room name must not exceed 50 characters")
+    .optional(),
+  description: z.string().trim().max(200, "Description must not exceed 200 characters").optional(),
+  language: z.nativeEnum(RoomLanguage).optional(),
+  status: z.nativeEnum(RoomStatus).optional(),
+});
+
+export type RoomUpdateInput = z.infer<typeof RoomUpdateSchema>;

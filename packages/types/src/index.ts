@@ -44,3 +44,78 @@ export interface RegisterResponse {
   message: string;
   data: UserResponseDTO;
 }
+
+export enum WorkspaceVisibility {
+  PUBLIC = "PUBLIC",
+  PRIVATE = "PRIVATE",
+}
+
+export enum RoomLanguage {
+  JAVASCRIPT = "javascript",
+  TYPESCRIPT = "typescript",
+  JAVA = "java",
+  CPP = "cpp",
+  PYTHON = "python",
+  C = "c",
+  GO = "go",
+  RUST = "rust",
+}
+
+export enum RoomStatus {
+  ACTIVE = "ACTIVE",
+  LOCKED = "LOCKED",
+  ARCHIVED = "ARCHIVED",
+}
+
+export enum MembershipRole {
+  OWNER = "OWNER",
+  ADMIN = "ADMIN",
+  EDITOR = "EDITOR",
+  VIEWER = "VIEWER",
+}
+
+export interface WorkspaceDTO {
+  id: string;
+  name: string;
+  description: string;
+  owner: string;
+  visibility: WorkspaceVisibility;
+  isArchived: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RoomDTO {
+  id: string;
+  workspace: string;
+  name: string;
+  description: string;
+  owner: string;
+  language: RoomLanguage;
+  status: RoomStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MembershipDTO {
+  workspace: string;
+  user: UserResponseDTO;
+  role: MembershipRole;
+  joinedAt: string;
+}
+
+export interface WorkspaceListResponse {
+  success: boolean;
+  data: WorkspaceDTO[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
+export interface RoomListResponse {
+  success: boolean;
+  data: RoomDTO[];
+}
