@@ -1,13 +1,25 @@
+import "../src/config/env.js";
 import request from "supertest";
 import mongoose from "mongoose";
 import app from "../src/app.js";
 import { User } from "../src/modules/user/user.model.js";
-import argon2 from "argon2";
+import bcrypt from "bcryptjs";
 import * as jose from "jose";
 import { jwtConfig } from "../src/config/jwt.js";
 import { UserRole } from "@codesync/types";
 
-const TEST_MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/codesync_test";
+const baseMongoUri = process.env.MONGO_URI;
+if (!baseMongoUri) {
+  throw new Error("MONGO_URI environment variable is required for tests but was not resolved.");
+}
+
+const parsedUri = new URL(baseMongoUri);
+if (parsedUri.pathname === "/" || !parsedUri.pathname) {
+  parsedUri.pathname = "/codesync_test";
+} else {
+  parsedUri.pathname = parsedUri.pathname + "_test";
+}
+const TEST_MONGO_URI = parsedUri.toString();
 
 describe("Auth Integration Tests", () => {
   beforeAll(async () => {
@@ -42,25 +54,25 @@ describe("Auth Integration Tests", () => {
       expect(res.body.data.name).toBe("Test User");
       expect(res.body.data.email).toBe("test@example.com");
       expect(res.body.data.role).toBe(UserRole.MEMBER);
-      expect(res.body.data.passwordHash).toBeUndefined();
+      expect(res.body.data.password).toBeUndefined();
 
       // Verify user is stored in DB
-      const dbUser = await User.findOne({ email: "test@example.com" }).select("+passwordHash");
+      const dbUser = await User.findOne({ email: "test@example.com" }).select("+password");
       expect(dbUser).not.toBeNull();
       expect(dbUser!.name).toBe("Test User");
 
-      // Verify it is a valid Argon2 hash
-      expect(dbUser!.passwordHash).not.toBe("SecurePassword123!");
-      const isPasswordValid = await argon2.verify(dbUser!.passwordHash, "SecurePassword123!");
+      // Verify it is a valid bcrypt hash
+      expect(dbUser!.password).not.toBe("SecurePassword123!");
+      const isPasswordValid = await bcrypt.compare("SecurePassword123!", dbUser!.password);
       expect(isPasswordValid).toBe(true);
     });
 
     it("should reject duplicate email with 409 Conflict", async () => {
-      const passwordHash = await argon2.hash("SecurePassword123!");
+      const hashedPassword = await bcrypt.hash("SecurePassword123!", 10);
       await User.create({
         name: "Existing User",
         email: "duplicate@example.com",
-        passwordHash,
+        password: hashedPassword,
       });
 
       const res = await request(app).post("/api/auth/register").send({
@@ -129,11 +141,11 @@ describe("Auth Integration Tests", () => {
     const testPassword = "SecurePassword123!";
 
     beforeEach(async () => {
-      const passwordHash = await argon2.hash(testPassword);
+      const hashedPassword = await bcrypt.hash(testPassword, 10);
       testUser = await User.create({
         name: "Login User",
         email: "login@example.com",
-        passwordHash,
+        password: hashedPassword,
         lastLogin: null,
       });
     });
@@ -151,7 +163,7 @@ describe("Auth Integration Tests", () => {
       expect(res.body.data.user.name).toBe("Login User");
       expect(res.body.data.user.email).toBe("login@example.com");
       expect(res.body.data.user.role).toBe(UserRole.MEMBER);
-      expect(res.body.data.user.passwordHash).toBeUndefined();
+      expect(res.body.data.user.password).toBeUndefined();
 
       // Check database to ensure lastLogin was updated
       const updatedUser = await User.findById(testUser._id);

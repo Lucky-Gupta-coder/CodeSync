@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import { LoginPage } from "./modules/auth/pages/LoginPage.js";
+import { SignupPage } from "./modules/auth/pages/SignupPage.js";
 import { DashboardPage } from "./pages/DashboardPage.js";
 import { ProtectedRoute } from "./modules/auth/components/ProtectedRoute.js";
 import { AuthProvider } from "./modules/auth/components/AuthProvider.js";
@@ -19,12 +20,20 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    path: "/",
+    path: "/signup",
+    element: <SignupPage />,
+  },
+  {
+    path: "/dashboard",
     element: (
       <ProtectedRoute>
         <DashboardPage />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "/",
+    element: <Navigate to="/dashboard" replace />,
   },
 ]);
 

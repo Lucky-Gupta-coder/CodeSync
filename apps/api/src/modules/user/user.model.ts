@@ -4,7 +4,7 @@ import { UserRole } from "@codesync/types";
 export interface IUser extends Document {
   name: string;
   email: string;
-  passwordHash: string;
+  password: string;
   avatar: string;
   role: UserRole;
   isVerified: boolean;
@@ -30,9 +30,9 @@ const UserSchema = new Schema<IUser>(
       unique: true,
       index: true,
     },
-    passwordHash: {
+    password: {
       type: String,
-      required: [true, "Password hash is required"],
+      required: [true, "Password is required"],
       select: false,
     },
     avatar: {
@@ -61,7 +61,7 @@ const UserSchema = new Schema<IUser>(
         sanitized.id = String(sanitized._id);
         delete sanitized._id;
         delete sanitized.__v;
-        delete sanitized.passwordHash;
+        delete sanitized.password;
         return sanitized;
       },
     },
@@ -71,7 +71,7 @@ const UserSchema = new Schema<IUser>(
         sanitized.id = String(sanitized._id);
         delete sanitized._id;
         delete sanitized.__v;
-        delete sanitized.passwordHash;
+        delete sanitized.password;
         return sanitized;
       },
     },

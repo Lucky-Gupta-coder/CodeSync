@@ -1,19 +1,26 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { useAuthStore } from "../store/auth.store.js";
-import { useCurrentUser } from "../hooks/useCurrentUser.js";
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const accessToken = useAuthStore((state) => state.accessToken);
+  const token = useAuthStore((state) => state.token || state.accessToken);
   const user = useAuthStore((state) => state.user);
+  const loading = useAuthStore((state) => state.loading);
+  const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser);
 
-  // Hook will fetch user context if token is present
-  const { isLoading } = useCurrentUser();
+  useEffect(() => {
+    if (token && !user) {
+      fetchCurrentUser().catch(() => {
+        // Ignored, handled inside the store (clears auth)
+      });
+    }
+  }, [token, user, fetchCurrentUser]);
 
-  const isInitializing = !!accessToken && !user && isLoading;
+  // We are initializing if there is a token but no user object and loading is true
+  const isInitializing = !!token && !user && loading;
 
   if (isInitializing) {
     return (

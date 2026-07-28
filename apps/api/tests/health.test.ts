@@ -13,6 +13,8 @@ jest.mock("mongoose", () => {
     connection: {
       ...actualMongoose.connection,
       readyState: 1, // Default to connected (1)
+      name: "codesync_test",
+      host: "localhost",
       on: jest.fn(),
     },
   };
@@ -29,6 +31,12 @@ describe("GET /api/health", () => {
     expect(res.body).toHaveProperty("timestamp");
     expect(res.body).toHaveProperty("environment");
     expect(res.body.services).toEqual({ database: "connected" });
+    expect(res.body.database).toEqual({
+      connected: true,
+      databaseName: "codesync_test",
+      host: "localhost",
+      readyState: 1,
+    });
   });
 
   it("should return status error when database is disconnected", async () => {
@@ -39,5 +47,11 @@ describe("GET /api/health", () => {
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("status", "error");
     expect(res.body.services).toEqual({ database: "disconnected" });
+    expect(res.body.database).toEqual({
+      connected: false,
+      databaseName: "codesync_test",
+      host: "localhost",
+      readyState: 0,
+    });
   });
 });

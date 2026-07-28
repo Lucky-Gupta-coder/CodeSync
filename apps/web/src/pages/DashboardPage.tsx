@@ -65,12 +65,25 @@ export const DashboardPage = () => {
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-12 relative z-10">
         <div className="text-center max-w-xl mb-12">
           <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-400">
-            Collaborative Developer Workspace
+            Welcome, {user?.name}
           </h1>
-          <p className="text-base text-slate-400">
-            Establishing the foundations for real-time collaboration, code execution, whiteboard
-            sharing, and rich communications.
-          </p>
+          <p className="text-base text-slate-400">Collaborative Developer Workspace</p>
+        </div>
+
+        {/* User Info Card */}
+        <div className="w-full max-w-md bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-6 shadow-2xl mb-8 flex flex-col items-center">
+          {/* Avatar Placeholder */}
+          <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center text-white font-black text-3xl shadow-lg shadow-indigo-600/30 mb-4">
+            {user?.name?.charAt(0).toUpperCase()}
+          </div>
+          <h2 className="text-xl font-bold text-white mb-1">{user?.name}</h2>
+          <p className="text-sm text-slate-400 mb-6">{user?.email}</p>
+          <button
+            onClick={handleLogout}
+            className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-lg border border-slate-700 transition-all cursor-pointer text-sm"
+          >
+            Logout
+          </button>
         </div>
 
         <StatusCard />

@@ -1,7 +1,7 @@
 import { User, IUser } from "./user.model.js";
 
 export class UserService {
-  async createUser(data: { name: string; email: string; passwordHash: string }): Promise<IUser> {
+  async createUser(data: { name: string; email: string; password: string }): Promise<IUser> {
     return await User.create(data);
   }
 
@@ -10,8 +10,8 @@ export class UserService {
   }
 
   async findUserByEmailWithPassword(email: string): Promise<IUser | null> {
-    // Explicitly select passwordHash since it is configured with select: false in the schema
-    return await User.findOne({ email }).select("+passwordHash");
+    // Explicitly select password since it is configured with select: false in the schema
+    return await User.findOne({ email }).select("+password");
   }
 
   async findUserById(id: string): Promise<IUser | null> {

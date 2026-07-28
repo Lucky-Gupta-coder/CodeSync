@@ -5,6 +5,12 @@ export interface HealthCheckResponse {
   services: {
     database: "connected" | "disconnected";
   };
+  database: {
+    connected: boolean;
+    databaseName: string;
+    host: string;
+    readyState: number;
+  };
 }
 
 export interface User {
@@ -24,6 +30,7 @@ export interface UserResponseDTO {
   name: string;
   email: string;
   role: UserRole;
+  avatar?: string;
 }
 
 export interface RegisterRequest {

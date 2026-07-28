@@ -1,5 +1,6 @@
-import argon2 from "argon2";
+import bcrypt from "bcryptjs";
 import { userService } from "../user/user.service.js";
+import { User } from "../user/user.model.js";
 import { mapToUserDTO } from "../user/user.mapper.js";
 import { jwtService } from "../../shared/auth/jwt.service.js";
 import { ConflictError } from "../../shared/errors/conflict-error.js";
@@ -20,22 +21,31 @@ export class AuthService {
     }
 
     try {
-      // Hash password using Argon2 secure defaults
-      const passwordHash = await argon2.hash(password);
+      // Hash password using bcrypt
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
 
       // Create new user record via user service
       const user = await userService.createUser({
         name,
         email,
-        passwordHash,
+        password: hashedPassword,
       });
 
-      logger.info(`User registered successfully: ${email} (ID: ${user._id})`);
+      // Log: inserted user id, email, and collection name
+      const collectionName = User.collection.name;
+      logger.info(
+        `User successfully inserted into MongoDB. ` +
+          `ID: ${user._id}, Email: ${user.email}, Collection: ${collectionName}`
+      );
 
       // Map document directly to DTO shape
       return mapToUserDTO(user);
     } catch (error) {
-      logger.error(`Unexpected failure during user registration for ${email}: ${error}`);
+      const err = error as Error;
+      logger.error(
+        `Validation or Database error during user registration for ${email}: ${err.message || err}`
+      );
       throw error;
     }
   }
@@ -43,15 +53,26 @@ export class AuthService {
   async login(input: LoginInput): Promise<{ accessToken: string; user: UserResponseDTO }> {
     const { email, password } = input;
 
-    // Find user with password hash selected explicitly
+    // Query database for user with password field
     const user = await userService.findUserByEmailWithPassword(email);
+
+    const userFound = !!user;
+    const passwordExists = !!(user && user.password);
+
+    // Audit logs for login query
+    logger.info(
+      `Login query executed. Email searched: ${email}, ` +
+        `User found: ${userFound}, ` +
+        `Password field exists: ${passwordExists}`
+    );
+
     if (!user) {
       logger.warn(`Login attempt failed: Email not found - ${email}`);
       throw new UnauthorizedError("Invalid email or password");
     }
 
-    // Verify using argon2.verify
-    const isValid = await argon2.verify(user.passwordHash, password);
+    // Verify using bcrypt.compare
+    const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
       logger.warn(`Login attempt failed: Incorrect password for ${email}`);
       throw new UnauthorizedError("Invalid email or password");
