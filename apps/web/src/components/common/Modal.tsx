@@ -34,7 +34,11 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
       />
 
       {/* Content box */}
-      <div className="relative w-full max-w-md transform overflow-hidden rounded-2xl border border-slate-850 bg-slate-900 p-6 shadow-2xl transition-all z-10 animate-in fade-in zoom-in-95 duration-200">
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="relative w-full max-w-md transform overflow-hidden rounded-2xl border border-slate-850 bg-slate-900 p-6 shadow-2xl transition-all z-10 animate-in fade-in zoom-in-95 duration-200"
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
           <h3 className="text-lg font-bold text-white">{title}</h3>

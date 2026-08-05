@@ -118,4 +118,10 @@ export interface WorkspaceListResponse {
 export interface RoomListResponse {
   success: boolean;
   data: RoomDTO[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
 }

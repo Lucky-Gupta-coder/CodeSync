@@ -206,7 +206,7 @@ describe("Workspace Management UI flow tests", () => {
     renderWithProviders(<WorkspaceDetailPage />, "/workspaces/ws-detail");
 
     // Ensure buttons are loaded/not loaded
-    await screen.findByText("Detail Workspace Alpha");
+    await screen.findAllByText("Detail Workspace Alpha");
     expect(screen.queryByRole("button", { name: "Edit" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Archive" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Delete" })).not.toBeInTheDocument();

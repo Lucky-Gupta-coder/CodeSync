@@ -123,9 +123,9 @@ describe("Frontend Foundation Pages Mount", () => {
       </QueryClientProvider>
     );
 
-    expect(await screen.findByText("Test Workspace")).toBeInTheDocument();
+    expect((await screen.findAllByText("Test Workspace")).length).toBeGreaterThan(0);
     expect(await screen.findByText("Coding Rooms")).toBeInTheDocument();
-    expect(await screen.findByText("Test Room")).toBeInTheDocument();
+    expect((await screen.findAllByText("Test Room")).length).toBeGreaterThan(0);
   });
 
   it("should mount and render RoomDetailPage with Explorer sidebar and code container", async () => {

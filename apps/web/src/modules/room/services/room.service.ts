@@ -1,10 +1,41 @@
 import { apiClient } from "../../../api/client.js";
 import { RoomDTO, RoomLanguage, RoomStatus } from "@codesync/types";
 
+export interface GetRoomsParams {
+  search?: string;
+  language?: string;
+  status?: string;
+  owner?: string;
+  sortBy?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface GetRoomsResponse {
+  data: RoomDTO[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
 export const roomApi = {
-  getWorkspaceRooms: async (workspaceId: string): Promise<RoomDTO[]> => {
-    const response = await apiClient.get(`/api/workspaces/${workspaceId}/rooms`);
-    return response.data.data;
+  getWorkspaceRooms: async (
+    workspaceId: string,
+    params?: GetRoomsParams
+  ): Promise<GetRoomsResponse> => {
+    const response = await apiClient.get(`/api/workspaces/${workspaceId}/rooms`, { params });
+    return {
+      data: response.data.data || [],
+      pagination: response.data.pagination || {
+        total: (response.data.data || []).length,
+        page: 1,
+        limit: 10,
+        pages: 1,
+      },
+    };
   },
 
   getRoomById: async (id: string): Promise<RoomDTO> => {

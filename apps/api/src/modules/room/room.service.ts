@@ -144,9 +144,82 @@ export class RoomService {
     return this.mapToDTO(room);
   }
 
-  async getWorkspaceRooms(workspaceId: string): Promise<RoomDTO[]> {
-    const list = await Room.find({ workspace: workspaceId }).sort({ createdAt: 1 });
-    return list.map((r) => this.mapToDTO(r));
+  async getWorkspaceRooms(
+    workspaceId: string,
+    options?: {
+      search?: string;
+      language?: string;
+      status?: string;
+      owner?: string;
+      sortBy?: string;
+      page?: number;
+      limit?: number;
+    }
+  ): Promise<{
+    rooms: RoomDTO[];
+    pagination: { total: number; page: number; limit: number; pages: number };
+  }> {
+    const query: Record<string, unknown> = { workspace: workspaceId };
+
+    if (options?.search) {
+      const searchRegex = new RegExp(options.search, "i");
+      query.$or = [{ name: searchRegex }, { description: searchRegex }, { language: searchRegex }];
+    }
+
+    if (options?.language && options.language !== "ALL" && options.language !== "all") {
+      query.language = options.language.toLowerCase();
+    }
+
+    if (options?.status && options.status !== "ALL" && options.status !== "all") {
+      query.status = options.status.toUpperCase();
+    }
+
+    if (options?.owner) {
+      query.owner = options.owner;
+    }
+
+    let sortOption: Record<string, 1 | -1> = { createdAt: -1 };
+    switch (options?.sortBy) {
+      case "oldest":
+        sortOption = { createdAt: 1 };
+        break;
+      case "updated":
+      case "recently_updated":
+        sortOption = { updatedAt: -1 };
+        break;
+      case "alphabetical":
+      case "name":
+        sortOption = { name: 1 };
+        break;
+      case "language":
+        sortOption = { language: 1 };
+        break;
+      case "newest":
+      default:
+        sortOption = { createdAt: -1 };
+        break;
+    }
+
+    const page = Math.max(1, options?.page || 1);
+    const limit = Math.max(1, options?.limit || 10);
+
+    const total = await Room.countDocuments(query);
+    const pages = Math.ceil(total / limit) || 1;
+
+    const list = await Room.find(query)
+      .sort(sortOption)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    return {
+      rooms: list.map((r) => this.mapToDTO(r)),
+      pagination: {
+        total,
+        page,
+        limit,
+        pages,
+      },
+    };
   }
 }
 

@@ -21,11 +21,22 @@ export class RoomController {
   async getWorkspaceRooms(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { workspaceId } = req.params;
-      const rooms = await roomService.getWorkspaceRooms(workspaceId);
+      const { search, language, status, owner, sortBy, page, limit } = req.query;
+
+      const result = await roomService.getWorkspaceRooms(workspaceId, {
+        search: search ? String(search) : undefined,
+        language: language ? String(language) : undefined,
+        status: status ? String(status) : undefined,
+        owner: owner ? String(owner) : undefined,
+        sortBy: sortBy ? String(sortBy) : undefined,
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+      });
 
       res.status(200).json({
         success: true,
-        data: rooms,
+        data: result.rooms,
+        pagination: result.pagination,
       });
     } catch (error) {
       next(error);
