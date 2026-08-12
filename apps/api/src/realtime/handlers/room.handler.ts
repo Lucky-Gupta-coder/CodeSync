@@ -5,6 +5,7 @@ import { handleSocketError } from "../middleware/socket.error.js";
 import { presenceService } from "../services/presence.service.js";
 import { Room } from "../../modules/room/room.model.js";
 import { Membership } from "../../modules/workspace/membership.model.js";
+import { documentService } from "../services/document.service.js";
 
 export const handleRoomEvents = (socket: CodeSyncSocket) => {
   socket.on(SocketEvents.JOIN_ROOM, async (data, callback) => {
@@ -87,6 +88,13 @@ export const handleRoomEvents = (socket: CodeSyncSocket) => {
         socket.to(roomId).emit(SocketEvents.PRESENCE_UPDATE, { roomId, users: roomUsers });
         // The sender also might want to know they left if we send it back
         socket.emit(SocketEvents.PRESENCE_UPDATE, { roomId, users: roomUsers });
+
+        // If the room is now empty, clean up documents
+        if (roomUsers.length === 0) {
+          documentService.cleanupRoom(roomId).catch((err) => {
+            socketLogger.error(`Error cleaning up room ${roomId} documents`, { error: err });
+          });
+        }
       }
 
       if (callback) {

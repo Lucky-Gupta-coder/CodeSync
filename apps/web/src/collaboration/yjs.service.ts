@@ -59,7 +59,7 @@ class YjsService {
       const doc = new Y.Doc();
 
       // When local document changes, broadcast it to others via Socket.IO
-      doc.on("update", (update: Uint8Array, origin: any) => {
+      doc.on("update", (update: Uint8Array, origin: unknown) => {
         // Only broadcast if the update originated locally (not from the socket relay)
         if (origin !== this && this.socket) {
           const payload: DocumentSyncUpdate = {

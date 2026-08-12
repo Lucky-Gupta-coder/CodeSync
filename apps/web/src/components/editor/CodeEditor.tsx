@@ -1,4 +1,5 @@
 import Editor, { Monaco } from "@monaco-editor/react";
+import type { editor } from "monaco-editor";
 import * as Y from "yjs";
 import { MonacoBinding } from "y-monaco";
 import { useRef, useEffect } from "react";
@@ -25,10 +26,13 @@ export const CodeEditor = ({
   cursors = {},
   onCursorChange,
 }: CodeEditorProps) => {
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const bindingRef = useRef<MonacoBinding | null>(null);
   const monacoRef = useRef<Monaco | null>(null);
-  const decorationsRef = useRef<any>(null); // To store the Monaco decorations collection
+  const decorationsRef = useRef<{
+    set: (newDecorations: editor.IModelDeltaDecoration[]) => void;
+    clear: () => void;
+  } | null>(null); // To store the Monaco decorations collection
 
   const handleEditorChange = (value: string | undefined) => {
     if (onChange) {
@@ -40,41 +44,45 @@ export const CodeEditor = ({
     monacoRef.current = monaco;
   };
 
-  const handleEditorDidMount = (editor: any, monaco: Monaco) => {
-    editorRef.current = editor;
+  const handleEditorDidMount = (editorInstance: editor.IStandaloneCodeEditor) => {
+    editorRef.current = editorInstance;
 
     // Initialize empty decorations collection
-    if (editor.createDecorationsCollection) {
-      decorationsRef.current = editor.createDecorationsCollection([]);
+    if (editorInstance.createDecorationsCollection) {
+      const collection = editorInstance.createDecorationsCollection([]);
+      decorationsRef.current = {
+        set: (newDecorations) => collection.set(newDecorations),
+        clear: () => collection.clear(),
+      };
     } else {
       // Fallback for older Monaco versions
+      let oldDecorations: string[] = [];
       decorationsRef.current = {
-        decorations: [],
-        set: function (newDecorations: any[]) {
-          this.decorations = editor.deltaDecorations(this.decorations, newDecorations);
+        set: (newDecorations: editor.IModelDeltaDecoration[]) => {
+          oldDecorations = editorInstance.deltaDecorations(oldDecorations, newDecorations);
         },
-        clear: function () {
-          this.decorations = editor.deltaDecorations(this.decorations, []);
+        clear: () => {
+          oldDecorations = editorInstance.deltaDecorations(oldDecorations, []);
         },
       };
     }
 
     // Hook cursor changes
-    editor.onDidChangeCursorPosition((e: any) => {
+    editorInstance.onDidChangeCursorPosition((e: editor.ICursorPositionChangedEvent) => {
       if (onCursorChange) {
-        const selection = editor.getSelection();
+        const selection = editorInstance.getSelection();
         onCursorChange({
           lineNumber: e.position.lineNumber,
           column: e.position.column,
-          selectionStartLineNumber: selection.startLineNumber,
-          selectionStartColumn: selection.startColumn,
-          selectionEndLineNumber: selection.endLineNumber,
-          selectionEndColumn: selection.endColumn,
+          selectionStartLineNumber: selection ? selection.startLineNumber : e.position.lineNumber,
+          selectionStartColumn: selection ? selection.startColumn : e.position.column,
+          selectionEndLineNumber: selection ? selection.endLineNumber : e.position.lineNumber,
+          selectionEndColumn: selection ? selection.endColumn : e.position.column,
         });
       }
     });
 
-    editor.onDidChangeCursorSelection((e: any) => {
+    editorInstance.onDidChangeCursorSelection((e: editor.ICursorSelectionChangedEvent) => {
       if (onCursorChange) {
         onCursorChange({
           lineNumber: e.selection.positionLineNumber,
@@ -117,7 +125,7 @@ export const CodeEditor = ({
   useEffect(() => {
     if (!editorRef.current || !decorationsRef.current || !monacoRef.current) return;
 
-    const newDecorations: any[] = [];
+    const newDecorations: editor.IModelDeltaDecoration[] = [];
 
     // Create CSS classes dynamically if they don't exist
     // This allows us to use dynamic colors from the user object
@@ -200,12 +208,7 @@ export const CodeEditor = ({
       }
     });
 
-    if (decorationsRef.current.set) {
-      decorationsRef.current.set(newDecorations);
-    } else {
-      decorationsRef.current.clear();
-      decorationsRef.current.set(newDecorations);
-    }
+    decorationsRef.current.set(newDecorations);
 
     return () => {
       // Cleanup styles is tricky because we might unmount/remount often,

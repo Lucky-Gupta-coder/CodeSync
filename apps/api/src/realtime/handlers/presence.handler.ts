@@ -1,6 +1,5 @@
 import { SocketEvents, CursorUpdate } from "@codesync/types";
 import { CodeSyncSocket } from "../types/socket.types.js";
-import { socketLogger } from "../utils/socket.logger.js";
 import { handleSocketError } from "../middleware/socket.error.js";
 
 export const handlePresenceEvents = (socket: CodeSyncSocket) => {

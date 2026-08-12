@@ -11,7 +11,7 @@ import {
 } from "@codesync/types";
 
 export interface ServerToClientEvents {
-  [SocketEvents.ERROR]: (err: { code: string; message: string; details?: any }) => void;
+  [SocketEvents.ERROR]: (err: { code: string; message: string; details?: unknown }) => void;
   [SocketEvents.ROOM_JOINED]: (data: { roomId: string; members: SocketUser[] }) => void;
   [SocketEvents.ROOM_LEFT]: (data: { roomId: string; userId: string }) => void;
   [SocketEvents.AUTHENTICATED]: () => void;

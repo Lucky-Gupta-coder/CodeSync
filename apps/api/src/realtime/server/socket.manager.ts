@@ -87,7 +87,7 @@ export class SocketManager {
       }
     });
 
-    this.io.engine.on("connection_error", (err: any) => {
+    this.io.engine.on("connection_error", (err: Error) => {
       socketLogger.error("Socket Engine Connection Error", err);
     });
   }

@@ -2,6 +2,7 @@ import { SocketEvents } from "@codesync/types";
 import { CodeSyncSocket } from "../types/socket.types.js";
 import { presenceService } from "../services/presence.service.js";
 import { socketLogger } from "../utils/socket.logger.js";
+import { documentService } from "../services/document.service.js";
 
 export const handleConnection = (socket: CodeSyncSocket) => {
   const user = socket.data.user;
@@ -31,6 +32,14 @@ export const handleConnection = (socket: CodeSyncSocket) => {
         roomId,
         users,
       });
+
+      if (users.length === 0) {
+        documentService.cleanupRoom(roomId).catch((err) => {
+          socketLogger.error(`Error cleaning up room ${roomId} documents on disconnect`, {
+            error: err,
+          });
+        });
+      }
     }
   });
 };
