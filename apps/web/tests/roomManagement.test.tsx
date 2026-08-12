@@ -43,6 +43,39 @@ vi.mock("../src/api/client.ts", () => ({
   },
 }));
 
+// Mock Monaco Editor
+vi.mock("@monaco-editor/react", () => ({
+  default: ({ value, onChange, language }: any) => (
+    <div data-testid="mock-monaco-editor" data-language={language}>
+      <textarea
+        value={value || ""}
+        onChange={(e) => onChange?.(e.target.value)}
+        aria-label="Code Editor"
+      />
+    </div>
+  ),
+  __esModule: true,
+}));
+
+vi.mock("y-monaco", () => ({
+  MonacoBinding: class {
+    destroy() {}
+  },
+}));
+
+// Mock useSocket
+vi.mock("../src/socket/hooks/useSocket.js", () => ({
+  useSocket: () => null, // Return null directly as useSocket returns the socket instance
+}));
+
+vi.mock("../src/socket/hooks/useConnectionStatus.js", () => ({
+  useConnectionStatus: vi.fn(() => "DISCONNECTED"),
+}));
+
+vi.mock("../src/socket/hooks/useRoomConnection.js", () => ({
+  useRoomConnection: vi.fn(() => ({ isJoined: false, isJoining: false })),
+}));
+
 describe("Room Management UI & Detail Page Integration Tests", () => {
   let queryClient: QueryClient;
 
@@ -264,11 +297,21 @@ describe("Room Management UI & Detail Page Integration Tests", () => {
     expect(fileElements.length).toBeGreaterThan(0);
     expect(screen.getByText("Terminal Output")).toBeInTheDocument();
 
+    // Verify Monaco mock is rendered with initial code
+    const editor = await screen.findByTestId("mock-monaco-editor");
+    expect(editor).toBeInTheDocument();
+    expect(editor).toHaveAttribute("data-language", "javascript");
+
+    // Type in editor
+    const textarea = within(editor).getByRole("textbox");
+    fireEvent.change(textarea, { target: { value: "const updated = true;" } });
+    expect(textarea).toHaveValue("const updated = true;");
+
     // Click sidebar tab
     const membersTab = screen.getByRole("button", { name: /members/i });
     fireEvent.click(membersTab);
 
-    expect(screen.getByText("members Placeholder")).toBeInTheDocument();
+    expect(screen.getByText("Room Members")).toBeInTheDocument();
   });
 
   it("should hide modification controls for non-owner users", async () => {

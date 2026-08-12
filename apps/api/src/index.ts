@@ -15,6 +15,10 @@ const startServer = async () => {
     );
   });
 
+  // Initialize Socket.IO
+  const { socketManager } = await import("./realtime/server/socket.manager.js");
+  socketManager.initialize(server);
+
   // Graceful shutdown handler
   const shutdown = async () => {
     logger.info("Shutdown signal received. Gracefully closing resources...");

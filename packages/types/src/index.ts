@@ -125,3 +125,5 @@ export interface RoomListResponse {
     pages: number;
   };
 }
+
+export * from "./socket.js";

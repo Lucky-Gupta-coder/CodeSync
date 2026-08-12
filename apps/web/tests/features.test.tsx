@@ -27,6 +27,26 @@ vi.mock("../src/modules/room/services/room.service.js", () => ({
   },
 }));
 
+vi.mock("../src/socket/hooks/useSocket.js", () => ({
+  useSocket: vi.fn(() => ({
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
+  })),
+}));
+
+vi.mock("../src/socket/hooks/usePresence.js", () => ({
+  usePresence: vi.fn(() => ({ users: [], cursors: {}, updateCursor: vi.fn() })),
+}));
+
+vi.mock("../src/socket/hooks/useConnectionStatus.js", () => ({
+  useConnectionStatus: vi.fn(() => "DISCONNECTED"),
+}));
+
+vi.mock("../src/socket/hooks/useRoomConnection.js", () => ({
+  useRoomConnection: vi.fn(() => ({ isJoined: false, isJoining: false })),
+}));
+
 // Mock the API client to prevent network issues during vitest
 vi.mock("../src/api/client.ts", () => ({
   apiClient: {
@@ -153,7 +173,7 @@ describe("Frontend Foundation Pages Mount", () => {
 
     expect(await screen.findByText("Explorer")).toBeInTheDocument();
     expect((await screen.findAllByText("index.js")).length).toBeGreaterThan(0);
-    expect(await screen.findByText("Active Members (Mock)")).toBeInTheDocument();
+    expect(await screen.findByText("Active Members (0)")).toBeInTheDocument();
   });
 
   it("should mount and render ProfilePage", () => {

@@ -12,14 +12,24 @@ import { Avatar } from "../components/common/Avatar.js";
 import { Breadcrumbs } from "../components/common/Breadcrumbs.js";
 import { LanguageBadge } from "../components/room/LanguageBadge.js";
 import { RoomSidebar, RoomSidebarTab } from "../components/room/RoomSidebar.js";
+import { CodeEditor } from "../components/editor/CodeEditor.js";
+import { getLanguageFromFileName } from "../utils/language.js";
 import { EditRoomModal } from "../components/room/EditRoomModal.js";
 import { DeleteRoomModal } from "../components/room/DeleteRoomModal.js";
 import { Dialog } from "../components/common/Dialog.js";
 import { useAuthStore } from "../modules/auth/store/auth.store.js";
 import { useToastStore } from "../store/toast.store.js";
+import { useSocket } from "../socket/hooks/useSocket.js";
+import { useConnectionStatus } from "../socket/hooks/useConnectionStatus.js";
+import { useRoomConnection } from "../socket/hooks/useRoomConnection.js";
+import { useCollaborativeDocument } from "../collaboration/useCollaborativeDocument.js";
+import { usePresence } from "../socket/hooks/usePresence.js";
+import { ConnectionState } from "@codesync/types";
 
 export const RoomDetailPage = () => {
   const { id } = useParams<{ id: string }>();
+  const socket = useSocket();
+  const socketStatus = useConnectionStatus();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);
@@ -30,6 +40,23 @@ export const RoomDetailPage = () => {
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [isOpenArchiveDialog, setIsOpenArchiveDialog] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+
+  const [files, setFiles] = useState<Record<string, string>>({
+    "index.js": `// Welcome to CodeSync Room!\n\nimport { formatMsg } from "./utils.js";\n\nfunction main() {\n  const message = "Hello from collaborative room!";\n  console.log(formatMsg(message));\n}\n\nmain();`,
+    "utils.js": `export function formatMsg(msg) {\n  return \`[\${new Date().toISOString()}] \${msg}\`;\n}`,
+    "package.json": `{\n  "name": "codesync-sandbox",\n  "version": "1.0.0",\n  "type": "module",\n  "dependencies": {}\n}`,
+    "README.md": `# CodeSync Sandbox\n\nThis is a collaborative coding sandbox. Any modifications made here are synchronized in real-time.`,
+  });
+
+  // Manage room connection lifecycle (reconnecting, joining, leaving)
+  const { isJoined, isJoining } = useRoomConnection(socket, socketStatus, id);
+
+  // Get collaborative Yjs document text for the active file
+  // We only initialize the document sync if we have successfully joined the room
+  const ytext = useCollaborativeDocument(isJoined ? socket : null, id || "", activeFile);
+
+  // Get live presence and cursors
+  const { users, cursors, updateCursor } = usePresence(isJoined ? socket : null, id);
 
   // Fetch room details
   const {
@@ -159,19 +186,11 @@ export const RoomDetailPage = () => {
     { name: "README.md", size: "2.1 KB" },
   ];
 
-  const getCodeSnippet = (fileName: string, lang: string) => {
-    switch (fileName) {
-      case "index.js":
-        return `// Welcome to CodeSync Room!\n// Language: ${lang}\n\nimport { formatMsg } from "./utils.js";\n\nfunction main() {\n  const message = "Hello from collaborative room!";\n  console.log(formatMsg(message));\n}\n\nmain();`;
-      case "utils.js":
-        return `export function formatMsg(msg) {\n  return \`[\${new Date().toISOString()}] \${msg}\`;\n}`;
-      case "package.json":
-        return `{\n  "name": "codesync-sandbox",\n  "version": "1.0.0",\n  "type": "module",\n  "dependencies": {}\n}`;
-      case "README.md":
-        return `# CodeSync Sandbox\n\nThis is a collaborative coding sandbox. Any modifications made here are synchronized in real-time.`;
-      default:
-        return "// Empty file";
-    }
+  const handleEditorChange = (value: string) => {
+    setFiles((prev) => ({
+      ...prev,
+      [activeFile]: value,
+    }));
   };
 
   const isOwner =
@@ -195,7 +214,7 @@ export const RoomDetailPage = () => {
       {/* Room Header bar */}
       <div className="border border-slate-850 bg-slate-900/40 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
         <div className="flex items-center gap-3.5">
-          <div className="p-3 rounded-xl bg-indigo-600/10 text-indigo-400 shrink-0">
+          <div className="p-3 rounded-xl bg-indigo-600/10 text-indigo-400 shrink-0 relative">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -204,6 +223,22 @@ export const RoomDetailPage = () => {
                 d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
+            <div
+              className={`absolute top-0 right-0 -mt-1 -mr-1 w-3 h-3 rounded-full border-2 border-slate-900 ${
+                socketStatus === ConnectionState.CONNECTED && isJoined
+                  ? "bg-emerald-500"
+                  : socketStatus === ConnectionState.CONNECTING || isJoining
+                    ? "bg-amber-500 animate-pulse"
+                    : "bg-red-500"
+              }`}
+              title={
+                socketStatus === ConnectionState.CONNECTED && isJoined
+                  ? "Connected & Joined"
+                  : socketStatus === ConnectionState.CONNECTING || isJoining
+                    ? "Connecting..."
+                    : "Disconnected"
+              }
+            />
           </div>
           <div>
             {isLoadingRoom ? (
@@ -307,7 +342,7 @@ export const RoomDetailPage = () => {
                     {activeFile}
                   </span>
                   <span className="text-[10px] text-slate-500 uppercase tracking-wider hidden sm:inline">
-                    Future Monaco Integration Slot
+                    {getLanguageFromFileName(activeFile)}
                   </span>
                 </div>
                 {room && (
@@ -333,26 +368,24 @@ export const RoomDetailPage = () => {
               </div>
 
               {/* Code Display Area */}
-              <div className="flex-1 overflow-auto p-4 font-mono text-sm leading-relaxed text-indigo-100/90 bg-slate-950/10">
+              <div className="flex-1 overflow-hidden bg-slate-950">
                 {isLoadingRoom ? (
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-3 p-4">
                     <Skeleton className="h-4 w-1/3" />
                     <Skeleton className="h-4 w-2/3" />
                     <Skeleton className="h-4 w-1/2" />
                   </div>
                 ) : room ? (
-                  <div className="flex select-text">
-                    <div className="text-slate-700 text-right pr-4 select-none shrink-0 border-r border-slate-900 hidden sm:block">
-                      {getCodeSnippet(activeFile, room.language)
-                        .split("\n")
-                        .map((_, idx) => (
-                          <div key={idx}>{idx + 1}</div>
-                        ))}
-                    </div>
-                    <pre className="pl-4 overflow-x-auto whitespace-pre font-mono flex-1 text-slate-200">
-                      {getCodeSnippet(activeFile, room.language)}
-                    </pre>
-                  </div>
+                  <CodeEditor
+                    value={files[activeFile] || ""}
+                    ytext={ytext}
+                    language={getLanguageFromFileName(activeFile)}
+                    readOnly={!isOwner || room.status === RoomStatus.ARCHIVED}
+                    onChange={handleEditorChange}
+                    users={users}
+                    cursors={cursors}
+                    onCursorChange={updateCursor}
+                  />
                 ) : null}
               </div>
 
@@ -399,28 +432,36 @@ export const RoomDetailPage = () => {
                 )}
               </div>
 
-              {/* Active Members Placeholder */}
+              {/* Active Members */}
               <div className="border border-slate-850 bg-slate-950/40 rounded-2xl p-4 flex flex-col gap-3">
                 <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase">
-                  Active Members (Mock)
+                  Active Members ({users.length})
                 </span>
-                <div className="flex flex-col gap-2.5">
-                  <div className="flex items-center gap-2">
-                    <Avatar name="Owner User" size="sm" />
-                    <div className="flex flex-col">
-                      <span className="text-xs font-medium text-slate-200">Owner User</span>
-                      <span className="text-[9px] text-indigo-400 font-bold uppercase">OWNER</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Avatar name="Collaborator" size="sm" />
-                    <div className="flex flex-col">
-                      <span className="text-xs font-medium text-slate-200">Collaborator</span>
-                      <span className="text-[9px] text-emerald-400 font-bold uppercase">
-                        EDITOR
-                      </span>
-                    </div>
-                  </div>
+                <div className="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-2">
+                  {users.length === 0 ? (
+                    <span className="text-xs text-slate-500">No active members</span>
+                  ) : (
+                    users.map((u) => (
+                      <div key={u.userId} className="flex items-center gap-2">
+                        <div className="relative">
+                          <Avatar name={u.name} size="sm" />
+                          <div
+                            className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-slate-950"
+                            style={{ backgroundColor: u.color }}
+                            title="Online"
+                          />
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-xs font-medium text-slate-200 truncate">
+                            {u.name}
+                          </span>
+                          <span className="text-[9px] text-slate-500 font-bold uppercase truncate">
+                            {user?.id === u.userId ? "YOU" : "ONLINE"}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 

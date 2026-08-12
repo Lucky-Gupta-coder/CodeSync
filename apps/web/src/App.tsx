@@ -12,6 +12,7 @@ import { NotFoundPage } from "./pages/NotFoundPage.js";
 import { UnauthorizedPage } from "./pages/UnauthorizedPage.js";
 import { ProtectedRoute } from "./modules/auth/components/ProtectedRoute.js";
 import { AuthProvider } from "./modules/auth/components/AuthProvider.js";
+import { SocketProvider } from "./socket/SocketProvider.js";
 import { DashboardLayout } from "./layouts/DashboardLayout.js";
 import { ErrorBoundary } from "./components/common/ErrorBoundary.js";
 import { ToastContainer } from "./components/common/ToastContainer.js";
@@ -88,8 +89,10 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <RouterProvider router={router} />
-          <ToastContainer />
+          <SocketProvider>
+            <RouterProvider router={router} />
+            <ToastContainer />
+          </SocketProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
