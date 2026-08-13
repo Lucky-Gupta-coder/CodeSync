@@ -12,6 +12,7 @@ import { handleConnection } from "../handlers/connection.handler.js";
 import { handleRoomEvents } from "../handlers/room.handler.js";
 import { handleDocumentEvents } from "../handlers/document.handler.js";
 import { handlePresenceEvents } from "../handlers/presence.handler.js";
+import { handleChatEvents } from "../handlers/chat.handler.js";
 import { socketLogger } from "../utils/socket.logger.js";
 import { handleSocketError } from "../middleware/socket.error.js";
 
@@ -82,6 +83,7 @@ export class SocketManager {
         handleRoomEvents(socket);
         handleDocumentEvents(socket);
         handlePresenceEvents(socket);
+        handleChatEvents(socket);
       } catch (error) {
         handleSocketError(socket, error, "Connection Setup");
       }

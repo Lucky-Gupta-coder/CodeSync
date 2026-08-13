@@ -106,3 +106,15 @@ export const RoomUpdateSchema = z.object({
 });
 
 export type RoomUpdateInput = z.infer<typeof RoomUpdateSchema>;
+
+export const ChatMessageSchema = z
+  .object({
+    content: z
+      .string({ required_error: "Message content is required" })
+      .trim()
+      .min(1, "Message cannot be empty")
+      .max(2000, "Message is too long"),
+  })
+  .strict();
+
+export type ChatMessageInput = z.infer<typeof ChatMessageSchema>;

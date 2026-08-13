@@ -17,6 +17,11 @@ export enum SocketEvents {
   PRESENCE_LEFT = "presence:left",
   PRESENCE_UPDATE = "presence:update",
   CURSOR_UPDATE = "cursor:update",
+  CHAT_SEND_MESSAGE = "chat:send_message",
+  CHAT_GET_HISTORY = "chat:get_history",
+  CHAT_MESSAGE = "chat:message",
+  CHAT_HISTORY = "chat:history",
+  CHAT_ERROR = "chat:error",
 }
 
 export enum ConnectionState {
@@ -94,4 +99,33 @@ export interface DocumentState {
   roomId: string;
   fileId: string;
   state: ArrayBuffer; // Full Yjs document state vector
+}
+
+export interface ChatMessage {
+  roomId: string;
+  content: string;
+}
+
+export interface ChatMessageDTO {
+  id: string;
+  roomId: string;
+  sender: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  content: string;
+  createdAt: string;
+}
+
+export interface ChatHistoryRequest {
+  roomId: string;
+  limit?: number;
+  before?: string; // Cursor for pagination (createdAt timestamp)
+}
+
+export interface ChatHistoryResponse {
+  roomId: string;
+  messages: ChatMessageDTO[];
+  hasMore: boolean;
 }
