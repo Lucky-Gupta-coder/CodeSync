@@ -8,6 +8,9 @@ import {
   SocketResponse,
   RoomPresence,
   CursorUpdate,
+  ChatMessageDTO,
+  ChatHistoryRequest,
+  ChatHistoryResponse,
 } from "@codesync/types";
 
 export interface ServerToClientEvents {
@@ -23,6 +26,9 @@ export interface ServerToClientEvents {
   [SocketEvents.DOCUMENT_STATE_RESPONSE]: (data: DocumentState) => void;
   [SocketEvents.PRESENCE_UPDATE]: (data: RoomPresence) => void;
   [SocketEvents.CURSOR_UPDATE]: (data: CursorUpdate) => void;
+  [SocketEvents.CHAT_MESSAGE]: (data: ChatMessageDTO) => void;
+  [SocketEvents.CHAT_HISTORY]: (data: ChatHistoryResponse) => void;
+  [SocketEvents.CHAT_ERROR]: (err: { code: string; message: string }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -41,6 +47,14 @@ export interface ClientToServerEvents {
     data: DocumentState & { targetSocketId: string }
   ) => void;
   [SocketEvents.CURSOR_UPDATE]: (data: CursorUpdate) => void;
+  [SocketEvents.CHAT_SEND_MESSAGE]: (
+    data: { roomId: string; content: string },
+    callback?: (response: SocketResponse<ChatMessageDTO>) => void
+  ) => void;
+  [SocketEvents.CHAT_GET_HISTORY]: (
+    data: ChatHistoryRequest,
+    callback?: (response: SocketResponse<ChatHistoryResponse>) => void
+  ) => void;
 }
 
 export interface InterServerEvents {

@@ -184,12 +184,26 @@ describe("Chat Integration Tests", () => {
   });
 
   it("should fetch chat history correctly with pagination", async () => {
-    // Create 3 messages
-    await Message.create([
-      { workspace: workspace._id, room: room._id, sender: owner._id, content: "Msg 1" },
-      { workspace: workspace._id, room: room._id, sender: owner._id, content: "Msg 2" },
-      { workspace: workspace._id, room: room._id, sender: owner._id, content: "Msg 3" },
-    ]);
+    await Message.create({
+      workspace: workspace._id,
+      room: room._id,
+      sender: owner._id,
+      content: "Msg 1",
+    });
+    await new Promise((r) => setTimeout(r, 10));
+    await Message.create({
+      workspace: workspace._id,
+      room: room._id,
+      sender: owner._id,
+      content: "Msg 2",
+    });
+    await new Promise((r) => setTimeout(r, 10));
+    await Message.create({
+      workspace: workspace._id,
+      room: room._id,
+      sender: owner._id,
+      content: "Msg 3",
+    });
 
     clientSocket1 = Client(`http://localhost:${port}`, { auth: { token: ownerToken } });
 

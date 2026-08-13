@@ -13,6 +13,7 @@ import { Breadcrumbs } from "../components/common/Breadcrumbs.js";
 import { LanguageBadge } from "../components/room/LanguageBadge.js";
 import { RoomSidebar, RoomSidebarTab } from "../components/room/RoomSidebar.js";
 import { CodeEditor } from "../components/editor/CodeEditor.js";
+import { ChatPanel } from "../components/room/ChatPanel.js";
 import { getLanguageFromFileName } from "../utils/language.js";
 import { EditRoomModal } from "../components/room/EditRoomModal.js";
 import { DeleteRoomModal } from "../components/room/DeleteRoomModal.js";
@@ -290,7 +291,7 @@ export const RoomDetailPage = () => {
         </div>
 
         {/* Tab Content Display */}
-        {activeTab === "overview" || activeTab === "files" ? (
+        {activeTab === "overview" || activeTab === "files" || activeTab === "chat" ? (
           <div className="flex-1 flex flex-col md:flex-row gap-5 min-h-0 overflow-hidden">
             {/* Explorer Panel */}
             <aside className="w-full md:w-56 shrink-0 border border-slate-850 bg-slate-950/40 rounded-2xl flex flex-col overflow-hidden">
@@ -404,75 +405,88 @@ export const RoomDetailPage = () => {
               </div>
             </div>
 
-            {/* Right Information & Activity Sidebar */}
-            <aside className="w-full md:w-64 shrink-0 flex flex-col gap-4">
-              <div className="border border-slate-850 bg-slate-950/40 rounded-2xl p-4 flex flex-col gap-3">
-                <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase">
-                  Room Info
-                </span>
-                {room && (
-                  <div className="flex flex-col gap-2 text-xs">
-                    <div>
-                      <span className="text-slate-500">Language:</span>
-                      <span className="text-slate-200 font-medium ml-1">
-                        {room.language.toUpperCase()}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">Status:</span>
-                      <span className="text-slate-200 font-medium ml-1">{room.status}</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">Created:</span>
-                      <span className="text-slate-200 font-medium ml-1">
-                        {new Date(room.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Active Members */}
-              <div className="border border-slate-850 bg-slate-950/40 rounded-2xl p-4 flex flex-col gap-3">
-                <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase">
-                  Active Members ({users.length})
-                </span>
-                <div className="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-2">
-                  {users.length === 0 ? (
-                    <span className="text-xs text-slate-500">No active members</span>
-                  ) : (
-                    users.map((u) => (
-                      <div key={u.userId} className="flex items-center gap-2">
-                        <div className="relative">
-                          <Avatar name={u.name} size="sm" />
-                          <div
-                            className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-slate-950"
-                            style={{ backgroundColor: u.color }}
-                            title="Online"
-                          />
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-xs font-medium text-slate-200 truncate">
-                            {u.name}
-                          </span>
-                          <span className="text-[9px] text-slate-500 font-bold uppercase truncate">
-                            {user?.id === u.userId ? "YOU" : "ONLINE"}
-                          </span>
-                        </div>
+            {/* Right Information & Activity Sidebar or Chat Panel */}
+            {activeTab === "overview" && (
+              <aside className="w-full md:w-64 shrink-0 flex flex-col gap-4">
+                <div className="border border-slate-850 bg-slate-950/40 rounded-2xl p-4 flex flex-col gap-3">
+                  <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase">
+                    Room Info
+                  </span>
+                  {room && (
+                    <div className="flex flex-col gap-2 text-xs">
+                      <div>
+                        <span className="text-slate-500">Language:</span>
+                        <span className="text-slate-200 font-medium ml-1">
+                          {room.language.toUpperCase()}
+                        </span>
                       </div>
-                    ))
+                      <div>
+                        <span className="text-slate-500">Status:</span>
+                        <span className="text-slate-200 font-medium ml-1">{room.status}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500">Created:</span>
+                        <span className="text-slate-200 font-medium ml-1">
+                          {new Date(room.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
                   )}
                 </div>
-              </div>
 
-              {/* Recent Changes Placeholder */}
-              <div className="border border-slate-850 bg-slate-950/40 rounded-2xl p-4 flex flex-col gap-2">
-                <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase">
-                  Recent Activity
-                </span>
-                <p className="text-xs text-slate-500">Room created and initialized.</p>
-              </div>
-            </aside>
+                {/* Active Members */}
+                <div className="border border-slate-850 bg-slate-950/40 rounded-2xl p-4 flex flex-col gap-3">
+                  <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase">
+                    Active Members ({users.length})
+                  </span>
+                  <div className="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-2">
+                    {users.length === 0 ? (
+                      <span className="text-xs text-slate-500">No active members</span>
+                    ) : (
+                      users.map((u) => (
+                        <div key={u.userId} className="flex items-center gap-2">
+                          <div className="relative">
+                            <Avatar name={u.name} size="sm" />
+                            <div
+                              className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-slate-950"
+                              style={{ backgroundColor: u.color }}
+                              title="Online"
+                            />
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-xs font-medium text-slate-200 truncate">
+                              {u.name}
+                            </span>
+                            <span className="text-[9px] text-slate-500 font-bold uppercase truncate">
+                              {user?.id === u.userId ? "YOU" : "ONLINE"}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Recent Changes Placeholder */}
+                <div className="border border-slate-850 bg-slate-950/40 rounded-2xl p-4 flex flex-col gap-2">
+                  <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase">
+                    Recent Activity
+                  </span>
+                  <p className="text-xs text-slate-500">Room created and initialized.</p>
+                </div>
+              </aside>
+            )}
+
+            {activeTab === "chat" && (
+              <aside className="w-full md:w-80 shrink-0 flex flex-col bg-slate-950">
+                <ChatPanel
+                  socket={socket}
+                  roomId={id}
+                  isJoined={isJoined}
+                  socketStatus={socketStatus}
+                />
+              </aside>
+            )}
           </div>
         ) : activeTab === "members" ? (
           <div className="flex-1 flex flex-col border border-slate-850 bg-slate-950/30 rounded-2xl overflow-hidden min-w-0">

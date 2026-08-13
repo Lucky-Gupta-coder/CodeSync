@@ -2,9 +2,10 @@ import mongoose from "mongoose";
 import { Message } from "./message.model.js";
 import { Room } from "../room/room.model.js";
 import { Membership } from "../workspace/membership.model.js";
-import { User, IUser } from "../user/user.model.js";
+import { IUser } from "../user/user.model.js";
 import { ChatMessageDTO, ChatHistoryResponse } from "@codesync/types";
-import { NotFoundError, ForbiddenError } from "../../shared/errors/index.js";
+import { NotFoundError } from "../../shared/errors/not-found-error.js";
+import { ForbiddenError } from "../../shared/errors/forbidden-error.js";
 import { IMessage } from "./message.model.js";
 
 export class ChatService {
