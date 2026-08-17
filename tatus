@@ -1,0 +1,9 @@
+warning: in the working copy of 'apps/web/src/components/whiteboard/Whiteboard.test.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/components/whiteboard/WhiteboardCanvas.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/components/whiteboard/WhiteboardToolbar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/types/src/whiteboard.ts', LF will be replaced by CRLF the next time Git touches it
+ .../src/components/whiteboard/Whiteboard.test.tsx  |   6 [32m+[m[31m-[m
+ .../src/components/whiteboard/WhiteboardCanvas.tsx | 392 [32m+++++++++++++++++[m[31m----[m
+ .../components/whiteboard/WhiteboardToolbar.tsx    |   1 [32m+[m
+ packages/types/src/whiteboard.ts                   |  10 [32m+[m[31m-[m
+ 4 files changed, 341 insertions(+), 68 deletions(-)

@@ -6,6 +6,7 @@ export interface WhiteboardPoint {
 export enum WhiteboardTool {
   SELECT = "SELECT",
   PEN = "PEN",
+  LINE = "LINE",
   RECTANGLE = "RECTANGLE",
   ELLIPSE = "ELLIPSE",
   ERASER = "ERASER",
@@ -37,7 +38,14 @@ export interface WhiteboardEllipse extends WhiteboardObjectBase {
   height: number;
 }
 
-export type WhiteboardObject = WhiteboardDrawing | WhiteboardRectangle | WhiteboardEllipse;
+export interface WhiteboardLine extends WhiteboardObjectBase {
+  type: "LINE";
+  endX: number;
+  endY: number;
+}
+
+export type WhiteboardObject =
+  WhiteboardDrawing | WhiteboardRectangle | WhiteboardEllipse | WhiteboardLine;
 
 export interface WhiteboardState {
   objects: Record<string, WhiteboardObject>;

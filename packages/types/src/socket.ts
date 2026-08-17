@@ -25,6 +25,12 @@ export enum SocketEvents {
   WHITEBOARD_JOIN = "whiteboard:join",
   WHITEBOARD_LEAVE = "whiteboard:leave",
   WHITEBOARD_UPDATE = "whiteboard:update",
+  WHITEBOARD_OBJECT_ADD = "whiteboard:object_add",
+  WHITEBOARD_OBJECT_UPDATE = "whiteboard:object_update",
+  WHITEBOARD_OBJECT_DELETE = "whiteboard:object_delete",
+  WHITEBOARD_CLEAR = "whiteboard:clear",
+  WHITEBOARD_SYNC_REQUEST = "whiteboard:sync_request",
+  WHITEBOARD_SYNC_STATE = "whiteboard:sync_state",
 }
 
 export enum ConnectionState {
@@ -102,6 +108,31 @@ export interface DocumentState {
   roomId: string;
   fileId: string;
   state: ArrayBuffer; // Full Yjs document state vector
+}
+
+import { WhiteboardObject } from "./whiteboard.js";
+
+export interface WhiteboardObjectPayload {
+  roomId: string;
+  object: WhiteboardObject;
+}
+
+export interface WhiteboardDeletePayload {
+  roomId: string;
+  objectId: string;
+}
+
+export interface WhiteboardClearPayload {
+  roomId: string;
+}
+
+export interface WhiteboardSyncRequestPayload {
+  roomId: string;
+}
+
+export interface WhiteboardSyncStatePayload {
+  roomId: string;
+  objects: WhiteboardObject[];
 }
 
 export interface ChatMessage {

@@ -50,6 +50,7 @@ export const WhiteboardToolbar: React.FC<WhiteboardToolbarProps> = ({
   const tools = [
     { id: WhiteboardTool.SELECT, label: "Select", icon: "↖" },
     { id: WhiteboardTool.PEN, label: "Pen", icon: "✎" },
+    { id: WhiteboardTool.LINE, label: "Line", icon: "╱" },
     { id: WhiteboardTool.RECTANGLE, label: "Rectangle", icon: "⬜" },
     { id: WhiteboardTool.ELLIPSE, label: "Ellipse", icon: "◯" },
     { id: WhiteboardTool.ERASER, label: "Eraser", icon: "⌫" },

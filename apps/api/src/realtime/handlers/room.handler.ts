@@ -6,6 +6,7 @@ import { presenceService } from "../services/presence.service.js";
 import { Room } from "../../modules/room/room.model.js";
 import { Membership } from "../../modules/workspace/membership.model.js";
 import { documentService } from "../services/document.service.js";
+import { whiteboardService } from "../services/whiteboard.service.js";
 
 export const handleRoomEvents = (socket: CodeSyncSocket) => {
   socket.on(SocketEvents.JOIN_ROOM, async (data, callback) => {
@@ -89,10 +90,13 @@ export const handleRoomEvents = (socket: CodeSyncSocket) => {
         // The sender also might want to know they left if we send it back
         socket.emit(SocketEvents.PRESENCE_UPDATE, { roomId, users: roomUsers });
 
-        // If the room is now empty, clean up documents
+        // If the room is now empty, clean up documents and whiteboards
         if (roomUsers.length === 0) {
           documentService.cleanupRoom(roomId).catch((err) => {
             socketLogger.error(`Error cleaning up room ${roomId} documents`, { error: err });
+          });
+          whiteboardService.cleanupRoom(roomId).catch((err) => {
+            socketLogger.error(`Error cleaning up room ${roomId} whiteboard`, { error: err });
           });
         }
       }

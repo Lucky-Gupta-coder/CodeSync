@@ -16,6 +16,8 @@ import { handleChatEvents } from "../handlers/chat.handler.js";
 import { socketLogger } from "../utils/socket.logger.js";
 import { handleSocketError } from "../middleware/socket.error.js";
 
+import { handleWhiteboardEvents } from "../handlers/whiteboard.handler.js";
+
 export class SocketManager {
   private static instance: SocketManager;
   private io: Server<
@@ -84,6 +86,7 @@ export class SocketManager {
         handleDocumentEvents(socket);
         handlePresenceEvents(socket);
         handleChatEvents(socket);
+        handleWhiteboardEvents(socket);
       } catch (error) {
         handleSocketError(socket, error, "Connection Setup");
       }

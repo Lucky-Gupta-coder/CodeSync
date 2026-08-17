@@ -2,12 +2,25 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Whiteboard } from "./Whiteboard.js";
 
-// Mock the ResizeObserver for the canvas
-global.ResizeObserver = class ResizeObserver {
+// Mock resize observer
+class ResizeObserverMock {
   observe() {}
   unobserve() {}
   disconnect() {}
-};
+}
+global.ResizeObserver = ResizeObserverMock;
+
+// Mock useSocket
+vi.mock("../../socket/hooks/useSocket.js", () => ({
+  useSocket: vi.fn(() => ({
+    socket: {
+      on: vi.fn(),
+      off: vi.fn(),
+      emit: vi.fn(),
+    },
+    isConnected: true,
+  })),
+}));
 
 describe("Whiteboard Component (Phase 5.2 Drawing Engine)", () => {
   it("renders the whiteboard toolbar and canvas", () => {
@@ -17,9 +30,9 @@ describe("Whiteboard Component (Phase 5.2 Drawing Engine)", () => {
     expect(screen.getByTitle("Select")).toBeInTheDocument();
     expect(screen.getByTitle("Pen")).toBeInTheDocument();
     expect(screen.getByTitle("Eraser")).toBeInTheDocument();
-
-    // Check if canvas ready message is absent because it's a real canvas now
-    // expect(screen.queryByText(/Whiteboard canvas ready/i)).not.toBeInTheDocument();
+    expect(screen.getByTitle("Line")).toBeInTheDocument();
+    expect(screen.getByTitle("Rectangle")).toBeInTheDocument();
+    expect(screen.getByTitle("Ellipse")).toBeInTheDocument();
   });
 
   it("allows tool selection", () => {

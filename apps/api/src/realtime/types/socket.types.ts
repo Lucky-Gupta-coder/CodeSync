@@ -11,6 +11,11 @@ import {
   ChatMessageDTO,
   ChatHistoryRequest,
   ChatHistoryResponse,
+  WhiteboardObjectPayload,
+  WhiteboardDeletePayload,
+  WhiteboardClearPayload,
+  WhiteboardSyncRequestPayload,
+  WhiteboardSyncStatePayload,
 } from "@codesync/types";
 
 export interface ServerToClientEvents {
@@ -29,6 +34,11 @@ export interface ServerToClientEvents {
   [SocketEvents.CHAT_MESSAGE]: (data: ChatMessageDTO) => void;
   [SocketEvents.CHAT_HISTORY]: (data: ChatHistoryResponse) => void;
   [SocketEvents.CHAT_ERROR]: (err: { code: string; message: string }) => void;
+  [SocketEvents.WHITEBOARD_OBJECT_ADD]: (data: WhiteboardObjectPayload) => void;
+  [SocketEvents.WHITEBOARD_OBJECT_UPDATE]: (data: WhiteboardObjectPayload) => void;
+  [SocketEvents.WHITEBOARD_OBJECT_DELETE]: (data: WhiteboardDeletePayload) => void;
+  [SocketEvents.WHITEBOARD_CLEAR]: (data: WhiteboardClearPayload) => void;
+  [SocketEvents.WHITEBOARD_SYNC_STATE]: (data: WhiteboardSyncStatePayload) => void;
 }
 
 export interface ClientToServerEvents {
@@ -55,6 +65,11 @@ export interface ClientToServerEvents {
     data: ChatHistoryRequest,
     callback?: (response: SocketResponse<ChatHistoryResponse>) => void
   ) => void;
+  [SocketEvents.WHITEBOARD_OBJECT_ADD]: (data: WhiteboardObjectPayload) => void;
+  [SocketEvents.WHITEBOARD_OBJECT_UPDATE]: (data: WhiteboardObjectPayload) => void;
+  [SocketEvents.WHITEBOARD_OBJECT_DELETE]: (data: WhiteboardDeletePayload) => void;
+  [SocketEvents.WHITEBOARD_CLEAR]: (data: WhiteboardClearPayload) => void;
+  [SocketEvents.WHITEBOARD_SYNC_REQUEST]: (data: WhiteboardSyncRequestPayload) => void;
 }
 
 export interface InterServerEvents {
