@@ -22,6 +22,9 @@ export enum SocketEvents {
   CHAT_MESSAGE = "chat:message",
   CHAT_HISTORY = "chat:history",
   CHAT_ERROR = "chat:error",
+  WHITEBOARD_JOIN = "whiteboard:join",
+  WHITEBOARD_LEAVE = "whiteboard:leave",
+  WHITEBOARD_UPDATE = "whiteboard:update",
 }
 
 export enum ConnectionState {

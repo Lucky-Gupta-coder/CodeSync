@@ -18,6 +18,7 @@ import { getLanguageFromFileName } from "../utils/language.js";
 import { EditRoomModal } from "../components/room/EditRoomModal.js";
 import { DeleteRoomModal } from "../components/room/DeleteRoomModal.js";
 import { Dialog } from "../components/common/Dialog.js";
+import { Whiteboard } from "../components/whiteboard/Whiteboard.js";
 import { useAuthStore } from "../modules/auth/store/auth.store.js";
 import { useToastStore } from "../store/toast.store.js";
 import { useSocket } from "../socket/hooks/useSocket.js";
@@ -575,6 +576,10 @@ export const RoomDetailPage = () => {
                 </div>
               </div>
             </div>
+          </div>
+        ) : activeTab === "whiteboard" ? (
+          <div className="flex-1 flex flex-col min-w-0 h-full">
+            <Whiteboard roomId={id} readOnly={!isOwner || room?.status === RoomStatus.ARCHIVED} />
           </div>
         ) : (
           /* Other Tabs Placeholders (Settings) */
