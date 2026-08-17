@@ -126,4 +126,5 @@ export interface RoomListResponse {
   };
 }
 
+export { SocketEvents } from "./socket.js";
 export * from "./socket.js";
