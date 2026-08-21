@@ -10,7 +10,7 @@ interface WhiteboardProps {
 }
 
 export const Whiteboard: React.FC<WhiteboardProps> = ({ roomId, readOnly = false }) => {
-  const { socket } = useSocket();
+  const socket = useSocket();
   const {
     state,
     activeColor,
@@ -21,7 +21,6 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({ roomId, readOnly = false
     setActiveColor,
     setActiveStrokeWidth,
     addObject,
-    updateObject,
     removeObject,
     clearWhiteboard,
     undo,

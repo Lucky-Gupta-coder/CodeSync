@@ -104,6 +104,21 @@ export interface MembershipDTO {
   joinedAt: string;
 }
 
+export enum FileType {
+  FILE = "FILE",
+  FOLDER = "FOLDER",
+}
+
+export interface FileNodeDTO {
+  id: string;
+  roomId: string;
+  name: string;
+  type: FileType;
+  parentId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface WorkspaceListResponse {
   success: boolean;
   data: WorkspaceDTO[];

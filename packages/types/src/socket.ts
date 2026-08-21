@@ -31,6 +31,7 @@ export enum SocketEvents {
   WHITEBOARD_CLEAR = "whiteboard:clear",
   WHITEBOARD_SYNC_REQUEST = "whiteboard:sync_request",
   WHITEBOARD_SYNC_STATE = "whiteboard:sync_state",
+  FILE_TREE_UPDATED = "file:tree_updated",
 }
 
 export enum ConnectionState {

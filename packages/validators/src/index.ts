@@ -118,3 +118,29 @@ export const ChatMessageSchema = z
   .strict();
 
 export type ChatMessageInput = z.infer<typeof ChatMessageSchema>;
+
+export const FileCreateSchema = z.object({
+  name: z
+    .string({ required_error: "File or folder name is required" })
+    .trim()
+    .min(1, "Name must be at least 1 character")
+    .max(255, "Name must not exceed 255 characters")
+    .regex(/^(?!\.$|\.\.$)[^/\\:*?"<>|\x00-\x1F\x7F]+$/, "Name contains invalid characters"),
+  type: z.enum(["FILE", "FOLDER"]),
+  parentId: z.string().optional().nullable(),
+});
+
+export type FileCreateInput = z.infer<typeof FileCreateSchema>;
+
+export const FileUpdateSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "Name must be at least 1 character")
+    .max(255, "Name must not exceed 255 characters")
+    .regex(/^(?!\.$|\.\.$)[^/\\:*?"<>|\x00-\x1F\x7F]+$/, "Name contains invalid characters")
+    .optional(),
+  parentId: z.string().optional().nullable(),
+});
+
+export type FileUpdateInput = z.infer<typeof FileUpdateSchema>;

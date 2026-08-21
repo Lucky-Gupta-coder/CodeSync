@@ -39,6 +39,7 @@ export interface ServerToClientEvents {
   [SocketEvents.WHITEBOARD_OBJECT_DELETE]: (data: WhiteboardDeletePayload) => void;
   [SocketEvents.WHITEBOARD_CLEAR]: (data: WhiteboardClearPayload) => void;
   [SocketEvents.WHITEBOARD_SYNC_STATE]: (data: WhiteboardSyncStatePayload) => void;
+  [SocketEvents.FILE_TREE_UPDATED]: (data: { roomId: string }) => void;
 }
 
 export interface ClientToServerEvents {

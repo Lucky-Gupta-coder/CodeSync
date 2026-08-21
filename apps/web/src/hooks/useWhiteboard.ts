@@ -212,6 +212,8 @@ export const useWhiteboard = (roomId: string | undefined, socket: Socket | null)
       });
     };
 
+    if (!socket) return;
+
     socket.on(SocketEvents.WHITEBOARD_OBJECT_ADD, handleObjectAdd);
     socket.on(SocketEvents.WHITEBOARD_OBJECT_UPDATE, handleObjectUpdate);
     socket.on(SocketEvents.WHITEBOARD_OBJECT_DELETE, handleObjectDelete);

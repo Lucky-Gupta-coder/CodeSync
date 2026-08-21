@@ -13,12 +13,9 @@ global.ResizeObserver = ResizeObserverMock;
 // Mock useSocket
 vi.mock("../../socket/hooks/useSocket.js", () => ({
   useSocket: vi.fn(() => ({
-    socket: {
-      on: vi.fn(),
-      off: vi.fn(),
-      emit: vi.fn(),
-    },
-    isConnected: true,
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
   })),
 }));
 

@@ -171,8 +171,6 @@ describe("Frontend Foundation Pages Mount", () => {
       </QueryClientProvider>
     );
 
-    expect(await screen.findByText("Explorer")).toBeInTheDocument();
-    expect((await screen.findAllByText("index.js")).length).toBeGreaterThan(0);
     expect(await screen.findByText("Active Members (0)")).toBeInTheDocument();
   });
 

@@ -6,6 +6,30 @@ import { BadRequestError } from "../../shared/errors/bad-request-error.js";
 import { logger } from "../../config/logger.js";
 import { RoomLanguage, RoomStatus, RoomDTO } from "@codesync/types";
 
+import { fileService } from "../file/file.service.js";
+import { documentService } from "../../realtime/services/document.service.js";
+import { FileType } from "@codesync/types";
+import * as Y from "yjs";
+
+const DEFAULT_FILES = [
+  {
+    name: "index.js",
+    content: `// Welcome to CodeSync Room!\n\nimport { formatMsg } from "./utils.js";\n\nfunction main() {\n  const message = "Hello from collaborative room!";\n  console.log(formatMsg(message));\n}\n\nmain();`,
+  },
+  {
+    name: "utils.js",
+    content: `export function formatMsg(msg) {\n  return \`[\${new Date().toISOString()}] \${msg}\`;\n}`,
+  },
+  {
+    name: "package.json",
+    content: `{\n  "name": "codesync-sandbox",\n  "version": "1.0.0",\n  "type": "module",\n  "dependencies": {}\n}`,
+  },
+  {
+    name: "README.md",
+    content: `# CodeSync Sandbox\n\nThis is a collaborative coding sandbox. Any modifications made here are synchronized in real-time.`,
+  },
+];
+
 export class RoomService {
   private mapToDTO(room: IRoom): RoomDTO {
     return {
@@ -55,6 +79,24 @@ export class RoomService {
       language,
       status: RoomStatus.ACTIVE,
     });
+
+    // Auto-create default files
+    const roomIdStr = room._id.toString();
+    try {
+      for (const df of DEFAULT_FILES) {
+        const fileNode = await fileService.createFile(roomIdStr, {
+          name: df.name,
+          type: FileType.FILE,
+        });
+        const doc = new Y.Doc();
+        const text = doc.getText(fileNode.id);
+        text.insert(0, df.content);
+        const update = Y.encodeStateAsUpdate(doc);
+        await documentService.applyUpdate(roomIdStr, fileNode.id, update.buffer as ArrayBuffer);
+      }
+    } catch (err) {
+      logger.error(`Error auto-creating default files for room ${roomIdStr}`, err);
+    }
 
     logger.info(
       `Room created successfully: ${room.name} (ID: ${room._id}) in workspace ${workspaceId}`

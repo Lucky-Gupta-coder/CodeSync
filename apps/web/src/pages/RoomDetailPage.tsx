@@ -26,8 +26,10 @@ import { useConnectionStatus } from "../socket/hooks/useConnectionStatus.js";
 import { useRoomConnection } from "../socket/hooks/useRoomConnection.js";
 import { useCollaborativeDocument } from "../collaboration/useCollaborativeDocument.js";
 import { usePresence } from "../socket/hooks/usePresence.js";
-import { ConnectionState } from "@codesync/types";
-
+import { ConnectionState, SocketEvents } from "@codesync/types";
+import { FileExplorer } from "../components/room/FileExplorer.js";
+import { fileApi } from "../modules/room/services/file.service.js";
+import { useEffect } from "react";
 export const RoomDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const socket = useSocket();
@@ -38,24 +40,44 @@ export const RoomDetailPage = () => {
   const addToast = useToastStore((state) => state.addToast);
 
   const [activeTab, setActiveTab] = useState<RoomSidebarTab>("overview");
-  const [activeFile, setActiveFile] = useState("index.js");
+  const [activeFileId, setActiveFileId] = useState<string | null>(null);
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [isOpenArchiveDialog, setIsOpenArchiveDialog] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
 
-  const [files, setFiles] = useState<Record<string, string>>({
-    "index.js": `// Welcome to CodeSync Room!\n\nimport { formatMsg } from "./utils.js";\n\nfunction main() {\n  const message = "Hello from collaborative room!";\n  console.log(formatMsg(message));\n}\n\nmain();`,
-    "utils.js": `export function formatMsg(msg) {\n  return \`[\${new Date().toISOString()}] \${msg}\`;\n}`,
-    "package.json": `{\n  "name": "codesync-sandbox",\n  "version": "1.0.0",\n  "type": "module",\n  "dependencies": {}\n}`,
-    "README.md": `# CodeSync Sandbox\n\nThis is a collaborative coding sandbox. Any modifications made here are synchronized in real-time.`,
+  const { data: roomFiles = [] } = useQuery({
+    queryKey: ["roomFiles", id],
+    queryFn: () => fileApi.getRoomFiles(id || ""),
+    enabled: !!id,
   });
+
+  useEffect(() => {
+    if (roomFiles.length > 0 && !activeFileId) {
+      const firstFile = roomFiles.find((f) => f.type === "FILE");
+      if (firstFile) setActiveFileId(firstFile.id);
+    }
+  }, [roomFiles, activeFileId]);
+
+  const activeFileNode = roomFiles.find((f) => f.id === activeFileId);
+  const activeFileName = activeFileNode?.name || "No file selected";
 
   // Manage room connection lifecycle (reconnecting, joining, leaving)
   const { isJoined, isJoining } = useRoomConnection(socket, socketStatus, id);
 
+  useEffect(() => {
+    if (!socket || !isJoined) return;
+    const handleFileTreeUpdate = () => {
+      queryClient.invalidateQueries({ queryKey: ["roomFiles", id] });
+    };
+    socket.on(SocketEvents.FILE_TREE_UPDATED, handleFileTreeUpdate);
+    return () => {
+      socket.off(SocketEvents.FILE_TREE_UPDATED, handleFileTreeUpdate);
+    };
+  }, [socket, isJoined, id, queryClient]);
+
   // Get collaborative Yjs document text for the active file
   // We only initialize the document sync if we have successfully joined the room
-  const ytext = useCollaborativeDocument(isJoined ? socket : null, id || "", activeFile);
+  const ytext = useCollaborativeDocument(isJoined ? socket : null, id || "", activeFileId || "");
 
   // Get live presence and cursors
   const { users, cursors, updateCursor } = usePresence(isJoined ? socket : null, id);
@@ -181,20 +203,6 @@ export const RoomDetailPage = () => {
     );
   }
 
-  const mockFiles = [
-    { name: "index.js", size: "1.2 KB" },
-    { name: "utils.js", size: "840 B" },
-    { name: "package.json", size: "430 B" },
-    { name: "README.md", size: "2.1 KB" },
-  ];
-
-  const handleEditorChange = (value: string) => {
-    setFiles((prev) => ({
-      ...prev,
-      [activeFile]: value,
-    }));
-  };
-
   const isOwner =
     (workspace && user && String(workspace.owner) === String(user.id)) ||
     (room && user && String(room.owner) === String(user.id));
@@ -302,36 +310,12 @@ export const RoomDetailPage = () => {
                 </span>
                 <span className="text-[10px] text-slate-500 font-mono">FILES</span>
               </div>
-              <div className="flex-1 p-2 flex flex-col gap-1 overflow-y-auto">
-                {mockFiles.map((file) => (
-                  <button
-                    key={file.name}
-                    onClick={() => setActiveFile(file.name)}
-                    className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-                      activeFile === file.name
-                        ? "bg-indigo-600/10 text-indigo-400 font-semibold"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <svg
-                        className="h-4 w-4 shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                      <span className="truncate">{file.name}</span>
-                    </div>
-                    <span className="text-[10px] text-slate-600 font-mono">{file.size}</span>
-                  </button>
-                ))}
+              <div className="flex-1 p-0 overflow-y-auto">
+                <FileExplorer
+                  roomId={id}
+                  activeFileId={activeFileId}
+                  onFileSelect={setActiveFileId}
+                />
               </div>
             </aside>
 
@@ -341,10 +325,10 @@ export const RoomDetailPage = () => {
               <div className="h-10 border-b border-slate-850 bg-slate-950/80 flex items-center justify-between px-4 shrink-0">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono text-indigo-300 bg-indigo-950/40 px-3 py-1 rounded border border-indigo-900/40">
-                    {activeFile}
+                    {activeFileName}
                   </span>
                   <span className="text-[10px] text-slate-500 uppercase tracking-wider hidden sm:inline">
-                    {getLanguageFromFileName(activeFile)}
+                    {getLanguageFromFileName(activeFileName)}
                   </span>
                 </div>
                 {room && (
@@ -379,11 +363,9 @@ export const RoomDetailPage = () => {
                   </div>
                 ) : room ? (
                   <CodeEditor
-                    value={files[activeFile] || ""}
                     ytext={ytext}
-                    language={getLanguageFromFileName(activeFile)}
-                    readOnly={!isOwner || room.status === RoomStatus.ARCHIVED}
-                    onChange={handleEditorChange}
+                    language={getLanguageFromFileName(activeFileName)}
+                    readOnly={!isOwner || room.status === RoomStatus.ARCHIVED || !activeFileId}
                     users={users}
                     cursors={cursors}
                     onCursorChange={updateCursor}
