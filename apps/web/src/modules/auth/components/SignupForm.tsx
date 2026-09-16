@@ -39,36 +39,25 @@ export const SignupForm = () => {
   };
 
   return (
-    <div className="w-full bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-8 shadow-2xl shadow-slate-950/50 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-
+    <div className="w-full bg-surface-container-low border border-surface-container-highest rounded p-8 shadow-md">
       <div className="flex flex-col items-center mb-8">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-indigo-600/30 mb-4">
-          CS
+        <div className="flex items-center gap-2 mb-4">
+          <span className="material-symbols-outlined text-[32px] text-primary">data_object</span>
+          <span className="font-headline-md text-headline-md text-on-surface">CodeSync</span>
         </div>
-        <h2 className="text-2xl font-bold tracking-tight text-white mb-1">Create an Account</h2>
-        <p className="text-sm text-slate-400">Join CodeSync to start collaborating</p>
+        <h2 className="text-xl font-headline-sm tracking-tight text-on-surface mb-1">
+          Create an Account
+        </h2>
+        <p className="text-body-sm text-outline">Join CodeSync to start collaborating</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         {serverError && (
           <div
-            className="p-3.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-sm text-rose-400 flex items-start gap-2.5"
+            className="p-3 rounded bg-error/10 border border-error/20 text-body-sm text-on-error flex items-start gap-2"
             role="alert"
           >
-            <svg
-              className="w-5 h-5 shrink-0 text-rose-400 mt-0.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
+            <span className="material-symbols-outlined text-[18px]">error</span>
             <span>{serverError}</span>
           </div>
         )}
@@ -76,7 +65,7 @@ export const SignupForm = () => {
         <div>
           <label
             htmlFor="name"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2"
+            className="block text-label-sm font-label-sm text-on-surface uppercase tracking-wider mb-1.5"
           >
             Full Name
           </label>
@@ -85,16 +74,16 @@ export const SignupForm = () => {
             type="text"
             disabled={loading}
             aria-invalid={errors.name ? "true" : "false"}
-            className={`w-full bg-slate-950/60 border rounded-lg px-4.5 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all ${
+            className={`w-full bg-surface-container border rounded px-3 py-2 text-body-sm text-on-surface placeholder-outline-variant focus:outline-none focus:ring-1 focus:ring-primary-container transition-all ${
               errors.name
-                ? "border-rose-500 focus:border-rose-500"
-                : "border-slate-800 focus:border-indigo-500"
+                ? "border-error focus:border-error"
+                : "border-outline-variant focus:border-primary-container"
             }`}
             placeholder="John Doe"
             {...register("name")}
           />
           {errors.name && (
-            <p className="mt-1.5 text-xs text-rose-400" role="alert">
+            <p className="mt-1 text-label-sm text-error flex items-center gap-1" role="alert">
               <span>{errors.name.message}</span>
             </p>
           )}
@@ -103,7 +92,7 @@ export const SignupForm = () => {
         <div>
           <label
             htmlFor="email"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2"
+            className="block text-label-sm font-label-sm text-on-surface uppercase tracking-wider mb-1.5"
           >
             Email Address
           </label>
@@ -112,16 +101,16 @@ export const SignupForm = () => {
             type="email"
             disabled={loading}
             aria-invalid={errors.email ? "true" : "false"}
-            className={`w-full bg-slate-950/60 border rounded-lg px-4.5 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all ${
+            className={`w-full bg-surface-container border rounded px-3 py-2 text-body-sm text-on-surface placeholder-outline-variant focus:outline-none focus:ring-1 focus:ring-primary-container transition-all ${
               errors.email
-                ? "border-rose-500 focus:border-rose-500"
-                : "border-slate-800 focus:border-indigo-500"
+                ? "border-error focus:border-error"
+                : "border-outline-variant focus:border-primary-container"
             }`}
             placeholder="name@example.com"
             {...register("email")}
           />
           {errors.email && (
-            <p className="mt-1.5 text-xs text-rose-400" role="alert">
+            <p className="mt-1 text-label-sm text-error flex items-center gap-1" role="alert">
               <span>{errors.email.message}</span>
             </p>
           )}
@@ -130,7 +119,7 @@ export const SignupForm = () => {
         <div>
           <label
             htmlFor="password"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2"
+            className="block text-label-sm font-label-sm text-on-surface uppercase tracking-wider mb-1.5"
           >
             Password
           </label>
@@ -139,16 +128,16 @@ export const SignupForm = () => {
             type="password"
             disabled={loading}
             aria-invalid={errors.password ? "true" : "false"}
-            className={`w-full bg-slate-950/60 border rounded-lg px-4.5 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all ${
+            className={`w-full bg-surface-container border rounded px-3 py-2 text-body-sm text-on-surface placeholder-outline-variant focus:outline-none focus:ring-1 focus:ring-primary-container transition-all ${
               errors.password
-                ? "border-rose-500 focus:border-rose-500"
-                : "border-slate-800 focus:border-indigo-500"
+                ? "border-error focus:border-error"
+                : "border-outline-variant focus:border-primary-container"
             }`}
             placeholder="••••••••"
             {...register("password")}
           />
           {errors.password && (
-            <p className="mt-1.5 text-xs text-rose-400" role="alert">
+            <p className="mt-1 text-label-sm text-error flex items-center gap-1" role="alert">
               <span>{errors.password.message}</span>
             </p>
           )}
@@ -157,11 +146,11 @@ export const SignupForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer focus:outline-none"
+          className="w-full bg-primary-container hover:bg-primary-fixed-dim active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none text-on-primary font-body-sm py-2 px-4 rounded transition-all flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-container focus:ring-offset-2 mt-6"
         >
           {loading ? (
             <>
-              <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin h-4 w-4 text-on-primary" fill="none" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"
                   cx="12"
@@ -183,12 +172,12 @@ export const SignupForm = () => {
           )}
         </button>
 
-        <div className="text-center mt-4">
-          <p className="text-xs text-slate-400">
+        <div className="text-center mt-6 pt-4 border-t border-surface-container-highest">
+          <p className="text-body-sm text-outline">
             Already have an account?{" "}
             <Link
               to="/login"
-              className="text-indigo-400 hover:text-indigo-300 font-semibold underline"
+              className="text-primary hover:text-primary-container font-medium transition-colors"
             >
               Sign In
             </Link>
