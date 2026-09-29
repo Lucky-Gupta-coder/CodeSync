@@ -1,6 +1,7 @@
 import { Workspace, IWorkspace } from "./workspace.model.js";
 import { Membership } from "./membership.model.js";
 import { Room } from "../room/room.model.js";
+import { User } from "../user/user.model.js";
 import { ConflictError } from "../../shared/errors/conflict-error.js";
 import { NotFoundError } from "../../shared/errors/not-found-error.js";
 import { BadRequestError } from "../../shared/errors/bad-request-error.js";
@@ -234,6 +235,100 @@ export class WorkspaceService {
       total,
       pages,
     };
+  }
+
+  async addMemberByEmail(
+    workspaceId: string,
+    email: string,
+    role: MembershipRole = MembershipRole.VIEWER
+  ) {
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("Workspace not found");
+    }
+
+    const targetUser = await User.findOne({ email: email.toLowerCase() });
+    if (!targetUser) {
+      throw new NotFoundError("User not found with this email");
+    }
+
+    const existingMembership = await Membership.findOne({
+      workspace: workspaceId,
+      user: targetUser._id,
+    });
+
+    if (existingMembership) {
+      throw new ConflictError("User is already a member of this workspace");
+    }
+
+    const membership = await Membership.create({
+      workspace: workspaceId,
+      user: targetUser._id,
+      role,
+    });
+
+    logger.info(`Added user ${targetUser.email} to workspace ${workspaceId} with role ${role}`);
+
+    return {
+      id: String(membership._id),
+      workspace: String(membership.workspace),
+      role: membership.role,
+      joinedAt: membership.joinedAt,
+      user: {
+        id: String(targetUser._id),
+        name: targetUser.name,
+        email: targetUser.email,
+        role: targetUser.role,
+        avatar: targetUser.avatar,
+      },
+    };
+  }
+
+  async getWorkspaceMembers(workspaceId: string) {
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("Workspace not found");
+    }
+
+    const memberships = await Membership.find({ workspace: workspaceId }).populate(
+      "user",
+      "name email role avatar"
+    );
+
+    return memberships.map((m) => {
+      const user = m.user as any;
+      return {
+        id: String(m._id),
+        workspace: String(m.workspace),
+        role: m.role,
+        joinedAt: m.joinedAt,
+        user: {
+          id: String(user._id),
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+        },
+      };
+    });
+  }
+
+  async removeMember(workspaceId: string, userId: string) {
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("Workspace not found");
+    }
+
+    if (String(workspace.owner) === userId) {
+      throw new BadRequestError("Cannot remove the workspace owner");
+    }
+
+    const membership = await Membership.findOneAndDelete({ workspace: workspaceId, user: userId });
+    if (!membership) {
+      throw new NotFoundError("Membership not found");
+    }
+
+    logger.info(`Removed user ${userId} from workspace ${workspaceId}`);
   }
 }
 

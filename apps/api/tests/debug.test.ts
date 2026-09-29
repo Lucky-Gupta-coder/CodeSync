@@ -4,30 +4,16 @@ import mongoose from "mongoose";
 import app from "../src/app.js";
 import { User } from "../src/modules/user/user.model.js";
 
-const baseMongoUri = process.env.MONGO_URI;
-if (!baseMongoUri) {
-  throw new Error("MONGO_URI environment variable is required for tests but was not resolved.");
-}
-
-const parsedUri = new URL(baseMongoUri);
-if (parsedUri.pathname === "/" || !parsedUri.pathname) {
-  parsedUri.pathname = "/codesync_test";
-} else {
-  parsedUri.pathname = parsedUri.pathname + "_test";
-}
-const TEST_MONGO_URI = parsedUri.toString();
+import { setupTestDB, teardownTestDB } from "./setup/test-db.js";
 
 describe("Debug Database Integration Tests", () => {
   beforeAll(async () => {
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
-    }
-    await mongoose.connect(TEST_MONGO_URI);
+    await setupTestDB();
   });
 
   afterAll(async () => {
     await User.deleteMany({});
-    await mongoose.disconnect();
+    await teardownTestDB();
   });
 
   beforeEach(async () => {

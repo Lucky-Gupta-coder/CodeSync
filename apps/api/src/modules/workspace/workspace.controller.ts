@@ -118,6 +118,52 @@ export class WorkspaceController {
       next(error);
     }
   }
+
+  async addMember(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { email, role } = req.body;
+
+      const membership = await workspaceService.addMemberByEmail(id, email, role);
+
+      res.status(200).json({
+        success: true,
+        message: "Member added successfully",
+        data: membership,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getMembers(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const members = await workspaceService.getWorkspaceMembers(id);
+
+      res.status(200).json({
+        success: true,
+        data: members,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async removeMember(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id, userId } = req.params;
+
+      await workspaceService.removeMember(id, userId);
+
+      res.status(200).json({
+        success: true,
+        message: "Member removed successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const workspaceController = new WorkspaceController();

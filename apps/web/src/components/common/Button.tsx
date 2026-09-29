@@ -9,23 +9,22 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, variant = "primary", size = "md", loading, className = "", ...props }, ref) => {
     const baseStyle =
-      "inline-flex items-center justify-center font-semibold rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
+      "inline-flex items-center justify-center font-body-sm rounded transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-container disabled:opacity-50 disabled:pointer-events-none cursor-pointer active:scale-[0.99] gap-2";
 
     const variants = {
-      primary:
-        "bg-indigo-600 hover:bg-indigo-500 text-white border border-transparent shadow-md shadow-indigo-600/10",
-      secondary: "bg-slate-850 hover:bg-slate-800 text-slate-100 border border-slate-700/80",
-      danger:
-        "bg-red-650 hover:bg-red-600 text-white border border-transparent shadow-md shadow-red-600/10",
+      primary: "bg-primary-container hover:bg-primary-fixed-dim text-on-primary shadow-md",
+      secondary: "bg-surface-container hover:bg-surface-container-high text-on-surface",
+      danger: "bg-error hover:bg-error/90 text-on-error shadow-md",
       outline:
-        "bg-transparent hover:bg-slate-900 text-slate-300 border border-slate-800 hover:text-white",
-      ghost: "bg-transparent hover:bg-slate-900 text-slate-400 hover:text-white border-transparent",
+        "bg-transparent hover:bg-surface-container-high text-outline hover:text-on-surface border border-outline-variant",
+      ghost:
+        "bg-transparent hover:bg-surface-container-high text-outline hover:text-on-surface border-transparent",
     };
 
     const sizes = {
-      sm: "px-3 py-1.5 text-xs",
-      md: "px-4 py-2 text-sm",
-      lg: "px-5 py-2.5 text-base",
+      sm: "px-3 py-1.5 text-xs h-7 font-label-sm",
+      md: "px-4 py-2 text-sm h-9",
+      lg: "px-5 py-2.5 text-base h-10",
     };
 
     return (

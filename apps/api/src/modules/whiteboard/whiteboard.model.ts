@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface IWhiteboard extends Document {
   workspace: mongoose.Types.ObjectId;
   room: mongoose.Types.ObjectId;
-  objects: any[];
+  objects: unknown[];
   createdAt: Date;
   updatedAt: Date;
 }

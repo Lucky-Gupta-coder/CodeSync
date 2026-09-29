@@ -8,6 +8,7 @@ import {
   WorkspaceCreateSchema,
   WorkspaceUpdateSchema,
   RoomCreateSchema,
+  WorkspaceMemberAddSchema,
 } from "@codesync/validators";
 import { MembershipRole } from "@codesync/types";
 
@@ -49,6 +50,23 @@ router.post(
   "/:id/restore",
   requireWorkspacePermission(MembershipRole.OWNER),
   workspaceController.restore.bind(workspaceController)
+);
+
+router.post(
+  "/:id/members",
+  requireWorkspacePermission(MembershipRole.ADMIN),
+  validateRequest(WorkspaceMemberAddSchema),
+  workspaceController.addMember.bind(workspaceController)
+);
+router.get(
+  "/:id/members",
+  requireWorkspacePermission(MembershipRole.VIEWER),
+  workspaceController.getMembers.bind(workspaceController)
+);
+router.delete(
+  "/:id/members/:userId",
+  requireWorkspacePermission(MembershipRole.ADMIN),
+  workspaceController.removeMember.bind(workspaceController)
 );
 
 // Nested Room routes

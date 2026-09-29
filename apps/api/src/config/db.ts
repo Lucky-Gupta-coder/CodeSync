@@ -67,7 +67,7 @@ export const connectDB = async (): Promise<void> => {
       logger.warn("MongoDB connection lost. Reconnecting...");
     });
 
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(mongoUri, { directConnection: true });
 
     // Database connection verification logs
     logger.info(`Database Name: ${mongoose.connection.name}`);

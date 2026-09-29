@@ -28,7 +28,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ socket, roomId, isJoined, 
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
-    if (messagesEndRef.current) {
+    if (messagesEndRef.current && typeof messagesEndRef.current.scrollIntoView === "function") {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);

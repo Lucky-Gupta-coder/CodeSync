@@ -8,31 +8,18 @@ import * as jose from "jose";
 import { jwtConfig } from "../src/config/jwt.js";
 import { UserRole } from "@codesync/types";
 
-const baseMongoUri = process.env.MONGO_URI;
-if (!baseMongoUri) {
-  throw new Error("MONGO_URI environment variable is required for tests but was not resolved.");
-}
-
-const parsedUri = new URL(baseMongoUri);
-if (parsedUri.pathname === "/" || !parsedUri.pathname) {
-  parsedUri.pathname = "/codesync_test";
-} else {
-  parsedUri.pathname = parsedUri.pathname + "_test";
-}
-const TEST_MONGO_URI = parsedUri.toString();
+import { setupTestDB, teardownTestDB } from "./setup/test-db.js";
 
 describe("Auth Integration Tests", () => {
   beforeAll(async () => {
     // Re-connect to test database to avoid polluting main data
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
-    }
-    await mongoose.connect(TEST_MONGO_URI);
+
+    await setupTestDB();
   });
 
   afterAll(async () => {
     await User.deleteMany({});
-    await mongoose.disconnect();
+    await teardownTestDB();
   });
 
   beforeEach(async () => {

@@ -40,7 +40,8 @@ export class WhiteboardService {
 
       const savedWhiteboard = await WhiteboardModel.findOne({ room: roomId });
       if (savedWhiteboard && Array.isArray(savedWhiteboard.objects)) {
-        savedWhiteboard.objects.forEach((obj: any) => {
+        savedWhiteboard.objects.forEach((o: unknown) => {
+          const obj = o as Partial<WhiteboardObject>;
           if (obj && obj.id) {
             objects[obj.id] = obj as WhiteboardObject;
           }

@@ -171,7 +171,7 @@ describe("Frontend Foundation Pages Mount", () => {
       </QueryClientProvider>
     );
 
-    expect(await screen.findByText("Active Members (0)")).toBeInTheDocument();
+    expect(await screen.findByText("Members (0)")).toBeInTheDocument();
   });
 
   it("should mount and render ProfilePage", () => {

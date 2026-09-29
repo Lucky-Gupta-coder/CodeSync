@@ -1,12 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import {
-  ServerToClientEvents,
-  ClientToServerEvents,
-} from "@codesync/api/src/realtime/types/socket.types.js";
-import { SocketEvents } from "@codesync/types";
-
-// Note: Ensure @codesync/api is accessible or re-export these types from @codesync/types in a real production environment.
-// For now, we import the types relative to the workspace as per standard monorepo structure.
+import { SocketEvents, ServerToClientEvents, ClientToServerEvents } from "@codesync/types";
 
 export class SocketService {
   private socket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
@@ -49,7 +42,7 @@ export class SocketService {
   private setupListeners() {
     if (!this.socket) return;
 
-    this.socket.on("connect_error", (error) => {
+    this.socket.on("connect_error", (error: Error) => {
       console.error("Socket connection error:", error.message);
     });
 

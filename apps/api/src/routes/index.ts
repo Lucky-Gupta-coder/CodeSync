@@ -4,6 +4,7 @@ import authRouter from "../modules/auth/auth.routes.js";
 import debugRouter from "./debug.routes.js";
 import workspaceRouter from "../modules/workspace/workspace.routes.js";
 import roomRouter from "../modules/room/room.routes.js";
+import executionRouter from "../modules/execution/execution.routes.js";
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.use("/", healthRouter);
 router.use("/auth", authRouter);
 router.use("/workspaces", workspaceRouter);
 router.use("/rooms", roomRouter);
+router.use("/execution", executionRouter);
 
 // Mount debug routes only in non-production environments
 if (process.env.NODE_ENV !== "production") {

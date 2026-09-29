@@ -44,7 +44,7 @@ export const LoginSchema = z.object({
 
 export type LoginInput = z.infer<typeof LoginSchema>;
 
-import { WorkspaceVisibility, RoomLanguage, RoomStatus } from "@codesync/types";
+import { WorkspaceVisibility, RoomLanguage, RoomStatus, MembershipRole } from "@codesync/types";
 
 export const WorkspaceCreateSchema = z.object({
   name: z
@@ -75,6 +75,13 @@ export const WorkspaceUpdateSchema = z.object({
 });
 
 export type WorkspaceUpdateInput = z.infer<typeof WorkspaceUpdateSchema>;
+
+export const WorkspaceMemberAddSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  role: z.nativeEnum(MembershipRole).default(MembershipRole.VIEWER),
+});
+
+export type WorkspaceMemberAddInput = z.infer<typeof WorkspaceMemberAddSchema>;
 
 export const RoomCreateSchema = z.object({
   name: z

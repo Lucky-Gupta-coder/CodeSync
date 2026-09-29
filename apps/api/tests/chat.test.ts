@@ -19,18 +19,7 @@ import { Room } from "../src/modules/room/room.model.js";
 import { Message } from "../src/modules/chat/message.model.js";
 import { mapToUserDTO } from "../src/modules/user/user.mapper.js";
 
-const baseMongoUri = process.env.MONGO_URI;
-if (!baseMongoUri) {
-  throw new Error("MONGO_URI environment variable is required for tests but was not resolved.");
-}
-
-const parsedUri = new URL(baseMongoUri);
-if (parsedUri.pathname === "/" || !parsedUri.pathname) {
-  parsedUri.pathname = "/codesync_test";
-} else {
-  parsedUri.pathname = parsedUri.pathname + "_test";
-}
-const TEST_MONGO_URI = parsedUri.toString();
+import { setupTestDB, teardownTestDB } from "./setup/test-db.js";
 
 describe("Chat Integration Tests", () => {
   let io: Server;
@@ -46,10 +35,7 @@ describe("Chat Integration Tests", () => {
   let nonMemberToken: string;
 
   beforeAll(async () => {
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
-    }
-    await mongoose.connect(TEST_MONGO_URI);
+    await setupTestDB();
 
     owner = await User.create({
       name: "Owner",
@@ -107,7 +93,7 @@ describe("Chat Integration Tests", () => {
     await Membership.deleteMany({});
     await Room.deleteMany({});
     await Message.deleteMany({});
-    await mongoose.disconnect();
+    await teardownTestDB();
   });
 
   afterEach(() => {

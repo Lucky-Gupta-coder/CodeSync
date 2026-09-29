@@ -5,8 +5,8 @@ import {
   ServerToClientEvents,
   InterServerEvents,
   SocketData,
-  CodeSyncSocket,
-} from "../types/socket.types.js";
+} from "@codesync/types";
+import { CodeSyncSocket } from "../types/socket.types.js";
 import { socketAuthMiddleware } from "../middleware/socket.auth.js";
 import { handleConnection } from "../handlers/connection.handler.js";
 import { handleRoomEvents } from "../handlers/room.handler.js";

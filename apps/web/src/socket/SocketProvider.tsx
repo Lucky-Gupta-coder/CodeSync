@@ -1,12 +1,13 @@
 import React, { createContext, useEffect, useState } from "react";
 import { socketService } from "./socket.service.js";
 import { Socket } from "socket.io-client";
+import { useAuthStore } from "../modules/auth/store/auth.store.js";
 import {
+  SocketEvents,
+  ConnectionState,
   ServerToClientEvents,
   ClientToServerEvents,
-} from "@codesync/api/src/realtime/types/socket.types.js";
-import { useAuthStore } from "../modules/auth/store/auth.store.js";
-import { SocketEvents, ConnectionState } from "@codesync/types";
+} from "@codesync/types";
 
 interface SocketContextValue {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;

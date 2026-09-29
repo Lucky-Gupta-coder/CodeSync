@@ -16,18 +16,7 @@ import {
   UserRole,
 } from "@codesync/types";
 
-const baseMongoUri = process.env.MONGO_URI;
-if (!baseMongoUri) {
-  throw new Error("MONGO_URI environment variable is required for tests but was not resolved.");
-}
-
-const parsedUri = new URL(baseMongoUri);
-if (parsedUri.pathname === "/" || !parsedUri.pathname) {
-  parsedUri.pathname = "/codesync_test";
-} else {
-  parsedUri.pathname = parsedUri.pathname + "_test";
-}
-const TEST_MONGO_URI = parsedUri.toString();
+import { setupTestDB, teardownTestDB } from "./setup/test-db.js";
 
 describe("Room Integration Tests", () => {
   let ownerToken: string;
@@ -43,10 +32,7 @@ describe("Room Integration Tests", () => {
   let workspace: any;
 
   beforeAll(async () => {
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
-    }
-    await mongoose.connect(TEST_MONGO_URI);
+    await setupTestDB();
 
     // Create users
     owner = await User.create({
@@ -85,7 +71,7 @@ describe("Room Integration Tests", () => {
     await Workspace.deleteMany({});
     await Membership.deleteMany({});
     await Room.deleteMany({});
-    await mongoose.disconnect();
+    await teardownTestDB();
   });
 
   beforeEach(async () => {

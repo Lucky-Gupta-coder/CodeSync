@@ -14,18 +14,7 @@ import { SocketManager } from "../src/realtime/server/socket.manager.js";
 
 import { socketManager } from "../src/realtime/server/socket.manager.js";
 
-const baseMongoUri = process.env.MONGO_URI;
-if (!baseMongoUri) {
-  throw new Error("MONGO_URI environment variable is required for tests but was not resolved.");
-}
-
-const parsedUri = new URL(baseMongoUri);
-if (parsedUri.pathname === "/" || !parsedUri.pathname) {
-  parsedUri.pathname = "/codesync_test";
-} else {
-  parsedUri.pathname = parsedUri.pathname + "_test";
-}
-const TEST_MONGO_URI = parsedUri.toString();
+import { setupTestDB, teardownTestDB } from "./setup/test-db.js";
 
 describe("File/Project Structure Integration Tests", () => {
   let userToken: string;
@@ -37,10 +26,7 @@ describe("File/Project Structure Integration Tests", () => {
   let otherRoom: any;
 
   beforeAll(async () => {
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
-    }
-    await mongoose.connect(TEST_MONGO_URI);
+    await setupTestDB();
 
     jest.spyOn(socketManager, "getIO").mockReturnValue({
       to: jest.fn().mockReturnValue({
@@ -95,9 +81,7 @@ describe("File/Project Structure Integration Tests", () => {
     await Room.deleteMany({});
     await Workspace.deleteMany({});
     await User.deleteMany({});
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
-    }
+
     jest.restoreAllMocks();
   });
 

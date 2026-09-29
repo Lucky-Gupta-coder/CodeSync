@@ -157,7 +157,7 @@ export const LoginForm = () => {
 
         <div className="text-center mt-6 pt-4 border-t border-surface-container-highest">
           <p className="text-body-sm text-outline">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               to="/register"
               className="text-primary hover:text-primary-container font-medium transition-colors"

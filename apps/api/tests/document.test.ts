@@ -4,26 +4,19 @@ import { documentService } from "../src/realtime/services/document.service.js";
 import { Room } from "../src/modules/room/room.model.js";
 import { Workspace } from "../src/modules/workspace/workspace.model.js";
 import * as Y from "yjs";
-import { MongoMemoryServer } from "mongodb-memory-server";
-import { jest } from "@jest/globals";
+import { setupTestDB, teardownTestDB } from "./setup/test-db.js";
 
 describe("Document Service and Persistence", () => {
-  jest.setTimeout(30000); // 30 seconds
-
-  let mongoServer: MongoMemoryServer;
   let workspaceId: mongoose.Types.ObjectId;
   let roomId: mongoose.Types.ObjectId;
   const fileId = "test-file-1";
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
-    await mongoose.connect(uri);
+    await setupTestDB();
   });
 
   afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+    await teardownTestDB();
   });
 
   beforeEach(async () => {

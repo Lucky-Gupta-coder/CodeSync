@@ -56,4 +56,22 @@ export const workspaceApi = {
     const response = await apiClient.post(`/api/workspaces/${id}/restore`);
     return response.data.data;
   },
+
+  addMember: async (workspaceId: string, email: string, role: string) => {
+    const response = await apiClient.post(`/api/workspaces/${workspaceId}/members`, {
+      email,
+      role,
+    });
+    return response.data.data;
+  },
+
+  getWorkspaceMembers: async (workspaceId: string) => {
+    const response = await apiClient.get(`/api/workspaces/${workspaceId}/members`);
+    return response.data.data;
+  },
+
+  removeMember: async (workspaceId: string, userId: string) => {
+    const response = await apiClient.delete(`/api/workspaces/${workspaceId}/members/${userId}`);
+    return response.data;
+  },
 };

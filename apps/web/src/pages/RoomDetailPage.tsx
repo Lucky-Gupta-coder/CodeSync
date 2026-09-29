@@ -1,24 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { roomApi } from "../modules/room/services/room.service.js";
 import { workspaceApi } from "../modules/workspace/services/workspace.service.js";
-import { RoomLanguage, RoomStatus } from "@codesync/types";
+import { RoomStatus } from "@codesync/types";
 import { RoomUpdateInput } from "@codesync/validators";
 import { Button } from "../components/common/Button.js";
-import { Badge } from "../components/common/Badge.js";
-import { Skeleton } from "../components/common/Skeleton.js";
 import { Avatar } from "../components/common/Avatar.js";
-import { Breadcrumbs } from "../components/common/Breadcrumbs.js";
-import { LanguageBadge } from "../components/room/LanguageBadge.js";
-import { RoomSidebar, RoomSidebarTab } from "../components/room/RoomSidebar.js";
 import { CodeEditor } from "../components/editor/CodeEditor.js";
 import { ChatPanel } from "../components/room/ChatPanel.js";
 import { getLanguageFromFileName } from "../utils/language.js";
 import { EditRoomModal } from "../components/room/EditRoomModal.js";
 import { DeleteRoomModal } from "../components/room/DeleteRoomModal.js";
 import { Dialog } from "../components/common/Dialog.js";
-import { Whiteboard } from "../components/whiteboard/Whiteboard.js";
 import { useAuthStore } from "../modules/auth/store/auth.store.js";
 import { useToastStore } from "../store/toast.store.js";
 import { useSocket } from "../socket/hooks/useSocket.js";
@@ -29,7 +23,13 @@ import { usePresence } from "../socket/hooks/usePresence.js";
 import { ConnectionState, SocketEvents } from "@codesync/types";
 import { FileExplorer } from "../components/room/FileExplorer.js";
 import { fileApi } from "../modules/room/services/file.service.js";
-import { useEffect } from "react";
+import { TerminalPanel } from "../components/room/TerminalPanel.js";
+import { Whiteboard } from "../components/whiteboard/Whiteboard.js";
+import { SettingsModal } from "../components/common/SettingsModal.js";
+import { ShareWorkspaceModal } from "../components/workspace/ShareWorkspaceModal.js";
+
+type RightPanelTab = "chat" | "members" | "activity";
+
 export const RoomDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const socket = useSocket();
@@ -39,12 +39,18 @@ export const RoomDetailPage = () => {
   const user = useAuthStore((state) => state.user);
   const addToast = useToastStore((state) => state.addToast);
 
-  const [activeTab, setActiveTab] = useState<RoomSidebarTab>("overview");
+  const [rightTab, setRightTab] = useState<RightPanelTab>("chat");
   const [activeFileId, setActiveFileId] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<"code" | "whiteboard">("code");
+
+  // Modals state
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [isOpenArchiveDialog, setIsOpenArchiveDialog] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [isOpenSettingsModal, setIsOpenSettingsModal] = useState(false);
+  const [isOpenShareModal, setIsOpenShareModal] = useState(false);
 
+  // Data fetching
   const { data: roomFiles = [] } = useQuery({
     queryKey: ["roomFiles", id],
     queryFn: () => fileApi.getRoomFiles(id || ""),
@@ -61,8 +67,7 @@ export const RoomDetailPage = () => {
   const activeFileNode = roomFiles.find((f) => f.id === activeFileId);
   const activeFileName = activeFileNode?.name || "No file selected";
 
-  // Manage room connection lifecycle (reconnecting, joining, leaving)
-  const { isJoined, isJoining } = useRoomConnection(socket, socketStatus, id);
+  const { isJoined } = useRoomConnection(socket, socketStatus, id);
 
   useEffect(() => {
     if (!socket || !isJoined) return;
@@ -75,19 +80,13 @@ export const RoomDetailPage = () => {
     };
   }, [socket, isJoined, id, queryClient]);
 
-  // Get collaborative Yjs document text for the active file
-  // We only initialize the document sync if we have successfully joined the room
   const ytext = useCollaborativeDocument(isJoined ? socket : null, id || "", activeFileId || "");
-
-  // Get live presence and cursors
   const { users, cursors, updateCursor } = usePresence(isJoined ? socket : null, id);
 
-  // Fetch room details
   const {
     data: room,
     isLoading: isLoadingRoom,
     error: roomError,
-    refetch: refetchRoom,
   } = useQuery({
     queryKey: ["room", id],
     queryFn: () => roomApi.getRoomById(id || ""),
@@ -95,14 +94,18 @@ export const RoomDetailPage = () => {
     enabled: !!id,
   });
 
-  // Fetch parent workspace details for breadcrumbs and owner check
   const { data: workspace } = useQuery({
     queryKey: ["workspace", room?.workspace],
     queryFn: () => workspaceApi.getWorkspaceById(room?.workspace || ""),
     enabled: !!room?.workspace,
   });
 
-  // Change room language/details mutation
+  const { data: members = [] } = useQuery({
+    queryKey: ["workspaceMembers", room?.workspace],
+    queryFn: () => workspaceApi.getWorkspaceMembers(room?.workspace || ""),
+    enabled: !!room?.workspace,
+  });
+
   const updateRoomMutation = useMutation({
     mutationFn: (data: RoomUpdateInput) => roomApi.updateRoom(id || "", data),
     onSuccess: () => {
@@ -119,7 +122,6 @@ export const RoomDetailPage = () => {
     },
   });
 
-  // Toggle archive status mutation
   const archiveRoomMutation = useMutation({
     mutationFn: () => {
       if (!room) return Promise.reject(new Error("Room not loaded"));
@@ -144,7 +146,6 @@ export const RoomDetailPage = () => {
     },
   });
 
-  // Delete room mutation
   const deleteRoomMutation = useMutation({
     mutationFn: () => roomApi.deleteRoom(id || ""),
     onSuccess: () => {
@@ -164,431 +165,302 @@ export const RoomDetailPage = () => {
     },
   });
 
-  if (!id) {
-    return <div className="text-slate-400">Room ID is missing.</div>;
-  }
-
   if (roomError) {
-    const status = (roomError as { response?: { status?: number } }).response?.status;
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-center">
-        <div className="w-12 h-12 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center font-bold text-lg">
-          {status || 500}
-        </div>
-        <div>
-          <h3 className="text-lg font-bold text-white">
-            {status === 404
-              ? "Room Not Found"
-              : status === 403
-                ? "Permission Denied"
-                : "Failed to load room"}
-          </h3>
-          <p className="text-xs text-slate-400 mt-1 max-w-sm">
-            {status === 404
-              ? "The room you are looking for does not exist or has been deleted."
-              : status === 403
-                ? "You do not have required permissions to view this coding room."
-                : "An unexpected error occurred while fetching room data."}
-          </p>
-        </div>
-        <div className="flex items-center gap-3 mt-2">
-          <Button size="sm" variant="outline" onClick={() => navigate("/workspaces")}>
-            Back to Workspaces
-          </Button>
-          <Button size="sm" onClick={() => refetchRoom()}>
-            Retry
-          </Button>
-        </div>
-      </div>
-    );
+    return <div className="p-8 text-error">Failed to load room.</div>;
   }
 
   const isOwner =
     (workspace && user && String(workspace.owner) === String(user.id)) ||
     (room && user && String(room.owner) === String(user.id));
 
-  return (
-    <div className="flex flex-col gap-5 h-[calc(100vh-6.5rem)]">
-      {/* Breadcrumb Navigation */}
-      <Breadcrumbs
-        items={[
-          { label: "Dashboard", href: "/dashboard" },
-          {
-            label: workspace?.name || "Workspace",
-            href: room?.workspace ? `/workspaces/${room.workspace}` : "/workspaces",
-          },
-          { label: room?.name || "Room" },
-        ]}
-      />
+  const currentUserMember = members.find((m: any) => String(m.user.id) === String(user?.id));
+  const hasEditorAccess =
+    currentUserMember &&
+    (currentUserMember.role === "OWNER" ||
+      currentUserMember.role === "ADMIN" ||
+      currentUserMember.role === "EDITOR");
 
-      {/* Room Header bar */}
-      <div className="border border-slate-850 bg-slate-900/40 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
-        <div className="flex items-center gap-3.5">
-          <div className="p-3 rounded-xl bg-indigo-600/10 text-indigo-400 shrink-0 relative">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <div
-              className={`absolute top-0 right-0 -mt-1 -mr-1 w-3 h-3 rounded-full border-2 border-slate-900 ${
-                socketStatus === ConnectionState.CONNECTED && isJoined
-                  ? "bg-emerald-500"
-                  : socketStatus === ConnectionState.CONNECTING || isJoining
-                    ? "bg-amber-500 animate-pulse"
-                    : "bg-red-500"
-              }`}
-              title={
-                socketStatus === ConnectionState.CONNECTED && isJoined
-                  ? "Connected & Joined"
-                  : socketStatus === ConnectionState.CONNECTING || isJoining
-                    ? "Connecting..."
-                    : "Disconnected"
-              }
+  const canEdit = isOwner || hasEditorAccess;
+
+  return (
+    <div className="flex flex-col h-screen bg-surface w-full overflow-hidden">
+      {/* Top Application Bar */}
+      <header className="h-12 bg-surface-container shrink-0 flex items-center justify-between px-4 border-b border-surface-container-highest">
+        {/* Left: Branding & Room Info */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[20px] text-primary">data_object</span>
+            <span className="font-headline-sm text-headline-sm text-on-surface">CodeSync</span>
+          </div>
+          <div className="w-px h-4 bg-outline-variant mx-2"></div>
+          <div className="flex items-center gap-2 bg-surface-container-low px-2 py-1 rounded text-body-sm font-body-sm">
+            <span className="material-symbols-outlined text-[16px] text-on-surface-variant">
+              folder
+            </span>
+            <span className="text-on-surface-variant">{workspace?.name || "Workspace"}</span>
+            <span className="text-outline-variant">/</span>
+            <span className="text-on-surface font-medium">{room?.name || "Room"}</span>
+            <span className="text-[10px] bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 rounded ml-1 font-label-sm">
+              Active Session
+            </span>
+          </div>
+        </div>
+
+        {/* Center: Search (Optional / Placeholder) */}
+        <div className="flex-1 max-w-xl hidden md:flex items-center">
+          <div className="w-full relative ml-8">
+            <span className="material-symbols-outlined absolute left-2.5 top-1.5 text-[18px] text-outline">
+              search
+            </span>
+            <input
+              type="text"
+              placeholder="Search rooms, files, symbols..."
+              className="w-full h-8 bg-surface-container-low border border-outline-variant rounded pl-9 pr-3 text-body-sm font-body-sm focus:outline-none focus:border-primary-container transition-colors"
+            />
+            <kbd className="absolute right-2 top-1.5 font-code-sm text-code-sm bg-surface-container px-1.5 rounded text-outline border border-outline-variant">
+              ⌘ K
+            </kbd>
+          </div>
+        </div>
+
+        {/* Right: Connection Status & Global Actions */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 text-code-sm font-code-sm bg-surface-container-lowest border border-outline-variant px-2 py-1 rounded">
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${socketStatus === ConnectionState.CONNECTED ? "bg-tertiary" : "bg-error"}`}
+            ></span>
+            <span className="text-tertiary">{socketStatus}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="text-outline hover:text-on-surface p-1">
+              <span className="material-symbols-outlined text-[20px]">menu_book</span>
+            </button>
+            <button className="text-outline hover:text-on-surface p-1">
+              <span className="material-symbols-outlined text-[20px]">notifications</span>
+            </button>
+          </div>
+          <div className="w-px h-4 bg-outline-variant"></div>
+          <Avatar name={user?.name || "User"} size="sm" />
+        </div>
+      </header>
+
+      {/* Main IDE Layout */}
+      <div className="flex-1 flex min-h-0">
+        {/* Left: Global Nav (Minimal Icons) */}
+        <aside className="w-12 bg-surface-container shrink-0 border-r border-surface-container-highest flex flex-col items-center py-4 gap-4">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="text-outline hover:text-on-surface p-2 rounded hover:bg-surface-container-high transition-colors"
+          >
+            <span className="material-symbols-outlined">dashboard</span>
+          </button>
+          <button
+            onClick={() => navigate("/workspaces")}
+            className="text-outline hover:text-on-surface p-2 rounded hover:bg-surface-container-high transition-colors"
+          >
+            <span className="material-symbols-outlined">folder_open</span>
+          </button>
+          <button
+            onClick={() => setActiveView("code")}
+            className={`p-2 rounded ${activeView === "code" ? "text-primary bg-primary-container/10 border-l-2 border-primary-container" : "text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors"}`}
+            title="Code Editor"
+          >
+            <span className="material-symbols-outlined">terminal</span>
+          </button>
+          <button
+            onClick={() => setActiveView("whiteboard")}
+            className={`p-2 rounded ${activeView === "whiteboard" ? "text-primary bg-primary-container/10 border-l-2 border-primary-container" : "text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors"}`}
+            title="Whiteboard"
+          >
+            <span className="material-symbols-outlined">draw</span>
+          </button>
+          <button
+            onClick={() => setIsOpenSettingsModal(true)}
+            className="text-outline hover:text-on-surface p-2 rounded hover:bg-surface-container-high transition-colors mt-auto"
+          >
+            <span className="material-symbols-outlined">settings</span>
+          </button>
+        </aside>
+
+        {/* File Explorer Panel */}
+        <aside className="w-64 bg-surface-container-low shrink-0 flex flex-col border-r border-surface-container-highest">
+          <div className="h-9 border-b border-surface-container-highest flex items-center px-4">
+            <span className="font-label-sm text-label-sm text-on-surface uppercase tracking-wider">
+              Files
+            </span>
+          </div>
+          <div className="flex-1 overflow-y-auto p-2">
+            <FileExplorer
+              roomId={id || ""}
+              activeFileId={activeFileId}
+              onFileSelect={setActiveFileId}
             />
           </div>
-          <div>
-            {isLoadingRoom ? (
-              <Skeleton className="h-6 w-48" />
-            ) : room ? (
-              <div className="flex items-center gap-3 flex-wrap">
-                <h2 className="text-xl font-bold text-white tracking-tight">{room.name}</h2>
-                <LanguageBadge language={room.language} size="sm" />
-                <Badge
-                  variant={room.status === RoomStatus.ACTIVE ? "success" : "warning"}
-                  size="sm"
-                >
-                  {room.status}
-                </Badge>
-              </div>
-            ) : null}
-            <p className="text-xs text-slate-400 mt-1 line-clamp-1">
-              {room?.description || "Collaborative sandbox workspace room."}
-            </p>
-          </div>
-        </div>
+        </aside>
 
-        {/* Room Header Action Buttons */}
-        {room && isOwner && (
-          <div className="flex items-center gap-2 shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={room.status === RoomStatus.ARCHIVED}
-              onClick={() => setIsOpenEditModal(true)}
-            >
-              Edit
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsOpenArchiveDialog(true)}>
-              {room.status === RoomStatus.ARCHIVED ? "Restore" : "Archive"}
-            </Button>
-            <Button variant="danger" size="sm" onClick={() => setIsOpenDeleteModal(true)}>
-              Delete
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Main Workspace split layout */}
-      <div className="flex-1 flex flex-col md:flex-row gap-5 min-h-0 overflow-hidden">
-        {/* Left Room Sidebar */}
-        <div className="w-full md:w-48 shrink-0">
-          <RoomSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        </div>
-
-        {/* Tab Content Display */}
-        {activeTab === "overview" || activeTab === "files" || activeTab === "chat" ? (
-          <div className="flex-1 flex flex-col md:flex-row gap-5 min-h-0 overflow-hidden">
-            {/* Explorer Panel */}
-            <aside className="w-full md:w-56 shrink-0 border border-slate-850 bg-slate-950/40 rounded-2xl flex flex-col overflow-hidden">
-              <div className="px-4 py-3 border-b border-slate-850 bg-slate-900/20 flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-400 tracking-wide uppercase">
-                  Explorer
+        {/* Center Editor & Terminal */}
+        <main className="flex-1 flex flex-col min-w-0 bg-background relative">
+          {/* Editor Tabs & Toolbar */}
+          <div
+            className={`h-9 bg-surface-container shrink-0 items-center justify-between border-b border-surface-container-highest ${activeView === "whiteboard" ? "hidden" : "flex"}`}
+          >
+            <div className="flex items-center h-full">
+              <div className="h-full px-4 border-r border-surface-container-highest bg-background flex items-center gap-2 relative">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-primary-container"></div>
+                <span className="text-primary-container font-label-sm">
+                  {getLanguageFromFileName(activeFileName).toUpperCase()}
                 </span>
-                <span className="text-[10px] text-slate-500 font-mono">FILES</span>
-              </div>
-              <div className="flex-1 p-0 overflow-y-auto">
-                <FileExplorer
-                  roomId={id}
-                  activeFileId={activeFileId}
-                  onFileSelect={setActiveFileId}
-                />
-              </div>
-            </aside>
-
-            {/* Editor & Terminal Center area */}
-            <div className="flex-1 flex flex-col border border-slate-850 bg-slate-950/30 rounded-2xl overflow-hidden min-w-0">
-              {/* Editor Tabs bar */}
-              <div className="h-10 border-b border-slate-850 bg-slate-950/80 flex items-center justify-between px-4 shrink-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-indigo-300 bg-indigo-950/40 px-3 py-1 rounded border border-indigo-900/40">
-                    {activeFileName}
-                  </span>
-                  <span className="text-[10px] text-slate-500 uppercase tracking-wider hidden sm:inline">
-                    {getLanguageFromFileName(activeFileName)}
-                  </span>
-                </div>
-                {room && (
-                  <select
-                    value={room.language}
-                    onChange={(e) =>
-                      updateRoomMutation.mutate({ language: e.target.value as RoomLanguage })
-                    }
-                    disabled={
-                      room.status === RoomStatus.ARCHIVED ||
-                      !isOwner ||
-                      updateRoomMutation.isPending
-                    }
-                    className="bg-slate-900 border border-slate-800 text-slate-300 rounded-lg px-2 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer disabled:opacity-60"
-                  >
-                    {Object.values(RoomLanguage).map((lang) => (
-                      <option key={lang} value={lang}>
-                        {lang.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {/* Code Display Area */}
-              <div className="flex-1 overflow-hidden bg-slate-950">
-                {isLoadingRoom ? (
-                  <div className="flex flex-col gap-3 p-4">
-                    <Skeleton className="h-4 w-1/3" />
-                    <Skeleton className="h-4 w-2/3" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </div>
-                ) : room ? (
-                  <CodeEditor
-                    ytext={ytext}
-                    language={getLanguageFromFileName(activeFileName)}
-                    readOnly={!isOwner || room.status === RoomStatus.ARCHIVED || !activeFileId}
-                    users={users}
-                    cursors={cursors}
-                    onCursorChange={updateCursor}
-                  />
-                ) : null}
-              </div>
-
-              {/* Terminal / Output Panel Placeholder */}
-              <div className="h-28 border-t border-slate-850 bg-slate-950 flex flex-col shrink-0">
-                <div className="h-7 px-4 bg-slate-900/30 border-b border-slate-850 flex items-center justify-between text-[11px] text-slate-400">
-                  <span className="font-semibold uppercase tracking-wider">Terminal Output</span>
-                  <span className="text-[10px] text-slate-600">Read-Only Placeholder</span>
-                </div>
-                <div className="flex-1 p-3 font-mono text-xs text-emerald-400/90 overflow-y-auto">
-                  <p>$ codesync-runner init --room={room?.id || "sandbox"}</p>
-                  <p className="text-slate-400">
-                    [INFO] Ready for execution. Reserved slot for socket output.
-                  </p>
-                </div>
+                <span className="font-code-md text-code-md text-on-surface">{activeFileName}</span>
+                <button className="ml-2 text-outline hover:text-on-surface">
+                  <span className="material-symbols-outlined text-[14px]">close</span>
+                </button>
               </div>
             </div>
+            <div className="flex items-center gap-3 pr-4">
+              <div className="flex items-center gap-2 font-code-sm text-code-sm text-tertiary">
+                <span className="w-1.5 h-1.5 bg-tertiary rounded-full"></span>
+                <span>Connected</span>
+                <span className="text-outline-variant">•</span>
+                <span>CRDT Synced</span>
+              </div>
 
-            {/* Right Information & Activity Sidebar or Chat Panel */}
-            {activeTab === "overview" && (
-              <aside className="w-full md:w-64 shrink-0 flex flex-col gap-4">
-                <div className="border border-slate-850 bg-slate-950/40 rounded-2xl p-4 flex flex-col gap-3">
-                  <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase">
-                    Room Info
-                  </span>
-                  {room && (
-                    <div className="flex flex-col gap-2 text-xs">
-                      <div>
-                        <span className="text-slate-500">Language:</span>
-                        <span className="text-slate-200 font-medium ml-1">
-                          {room.language.toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500">Status:</span>
-                        <span className="text-slate-200 font-medium ml-1">{room.status}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500">Created:</span>
-                        <span className="text-slate-200 font-medium ml-1">
-                          {new Date(room.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
+              <div className="flex items-center -space-x-1 ml-2">
+                {users.slice(0, 3).map((u) => (
+                  <div
+                    key={u.userId}
+                    className="w-6 h-6 rounded-full border border-surface bg-surface-container flex items-center justify-center text-[10px] font-bold text-on-surface"
+                    style={{ borderColor: u.color }}
+                  >
+                    {u.name.substring(0, 2).toUpperCase()}
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                variant="secondary"
+                size="sm"
+                className="h-6 text-[11px] px-2 ml-2"
+                onClick={() => setIsOpenShareModal(true)}
+              >
+                <span className="material-symbols-outlined text-[14px]">share</span> Share
+              </Button>
+            </div>
+          </div>
+
+          {/* Viewport */}
+          <div className="flex-1 min-h-0 relative flex flex-col">
+            {activeView === "code" ? (
+              <>
+                <div className="flex-1 min-h-0 relative">
+                  {isLoadingRoom ? (
+                    <div className="p-4 text-outline font-code-sm">Loading editor...</div>
+                  ) : (
+                    <CodeEditor
+                      ytext={ytext}
+                      language={getLanguageFromFileName(activeFileName)}
+                      readOnly={!canEdit || room?.status === RoomStatus.ARCHIVED || !activeFileId}
+                      users={users}
+                      cursors={cursors}
+                      onCursorChange={updateCursor}
+                    />
                   )}
                 </div>
-
-                {/* Active Members */}
-                <div className="border border-slate-850 bg-slate-950/40 rounded-2xl p-4 flex flex-col gap-3">
-                  <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase">
-                    Active Members ({users.length})
-                  </span>
-                  <div className="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-2">
-                    {users.length === 0 ? (
-                      <span className="text-xs text-slate-500">No active members</span>
-                    ) : (
-                      users.map((u) => (
-                        <div key={u.userId} className="flex items-center gap-2">
-                          <div className="relative">
-                            <Avatar name={u.name} size="sm" />
-                            <div
-                              className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-slate-950"
-                              style={{ backgroundColor: u.color }}
-                              title="Online"
-                            />
-                          </div>
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-xs font-medium text-slate-200 truncate">
-                              {u.name}
-                            </span>
-                            <span className="text-[9px] text-slate-500 font-bold uppercase truncate">
-                              {user?.id === u.userId ? "YOU" : "ONLINE"}
-                            </span>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                {/* Recent Changes Placeholder */}
-                <div className="border border-slate-850 bg-slate-950/40 rounded-2xl p-4 flex flex-col gap-2">
-                  <span className="text-[10px] font-bold text-slate-500 tracking-wide uppercase">
-                    Recent Activity
-                  </span>
-                  <p className="text-xs text-slate-500">Room created and initialized.</p>
-                </div>
-              </aside>
+                <TerminalPanel
+                  roomId={id || ""}
+                  ytext={ytext}
+                  language={getLanguageFromFileName(activeFileName)}
+                />
+              </>
+            ) : (
+              <Whiteboard roomId={id || ""} />
             )}
+          </div>
+        </main>
 
-            {activeTab === "chat" && (
-              <aside className="w-full md:w-80 shrink-0 flex flex-col bg-slate-950">
+        {/* Right Collaboration Panel */}
+        <aside className="w-80 bg-surface-container shrink-0 flex flex-col border-l border-surface-container-highest">
+          <div className="h-9 border-b border-surface-container-highest flex items-center px-2">
+            <button
+              onClick={() => setRightTab("chat")}
+              className={`flex-1 h-full font-label-sm text-label-sm uppercase tracking-wider ${rightTab === "chat" ? "text-on-surface border-b border-primary-container" : "text-outline hover:text-on-surface"}`}
+            >
+              Chat
+            </button>
+            <button
+              onClick={() => setRightTab("members")}
+              className={`flex-1 h-full font-label-sm text-label-sm uppercase tracking-wider ${rightTab === "members" ? "text-on-surface border-b border-primary-container" : "text-outline hover:text-on-surface"}`}
+            >
+              Members ({users.length})
+            </button>
+            <button
+              onClick={() => setRightTab("activity")}
+              className={`flex-1 h-full font-label-sm text-label-sm uppercase tracking-wider ${rightTab === "activity" ? "text-on-surface border-b border-primary-container" : "text-outline hover:text-on-surface"}`}
+            >
+              Activity
+            </button>
+          </div>
+
+          <div className="flex-1 min-h-0 relative">
+            {rightTab === "chat" && (
+              <div className="absolute inset-0 flex flex-col">
                 <ChatPanel
                   socket={socket}
-                  roomId={id}
+                  roomId={id || ""}
                   isJoined={isJoined}
                   socketStatus={socketStatus}
                 />
-              </aside>
+              </div>
+            )}
+            {rightTab === "members" && (
+              <div className="absolute inset-0 overflow-y-auto p-4 flex flex-col gap-4">
+                {users.map((u) => (
+                  <div key={u.userId} className="flex items-center gap-3">
+                    <div className="relative">
+                      <Avatar name={u.name} size="sm" />
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-tertiary rounded-full border-2 border-surface-container"></div>
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-body-sm font-semibold text-on-surface truncate">
+                        {u.name}
+                      </span>
+                      <span className="text-label-sm font-label-sm text-outline truncate">
+                        {user?.id === u.userId
+                          ? "You"
+                          : u.userId === room?.owner
+                            ? "Host"
+                            : "Collaborator"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {rightTab === "activity" && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                <span className="material-symbols-outlined text-[48px] text-outline mb-2">
+                  history
+                </span>
+                <span className="text-body-md text-on-surface mb-1">Activity Stream</span>
+                <span className="text-body-sm text-outline">Coming soon in a future update.</span>
+              </div>
             )}
           </div>
-        ) : activeTab === "members" ? (
-          <div className="flex-1 flex flex-col border border-slate-850 bg-slate-950/30 rounded-2xl overflow-hidden min-w-0">
-            <div className="h-14 border-b border-slate-850 bg-slate-950/80 flex items-center justify-between px-6 shrink-0">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                Room Members
-              </h3>
-              <Button size="sm" variant="outline" disabled={!isOwner}>
-                Invite Member
-              </Button>
-            </div>
-            <div className="flex-1 overflow-auto p-6 flex flex-col gap-4">
-              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-800 bg-slate-900/40">
-                <div className="flex items-center gap-4">
-                  <Avatar name="Owner User" size="md" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-slate-200">Owner User</span>
-                    <span className="text-xs text-slate-500">owner@example.com</span>
-                  </div>
-                </div>
-                <Badge variant="success">Owner</Badge>
-              </div>
-              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-800 bg-slate-900/40">
-                <div className="flex items-center gap-4">
-                  <Avatar name="Collaborator" size="md" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-slate-200">Collaborator</span>
-                    <span className="text-xs text-slate-500">collab@example.com</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="primary">Editor</Badge>
-                  {isOwner && (
-                    <button
-                      className="text-slate-500 hover:text-red-400 transition-colors"
-                      title="Remove Member"
-                      aria-label="Remove Member"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : activeTab === "activity" ? (
-          <div className="flex-1 flex flex-col border border-slate-850 bg-slate-950/30 rounded-2xl overflow-hidden min-w-0">
-            <div className="h-14 border-b border-slate-850 bg-slate-950/80 flex items-center px-6 shrink-0">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                Recent Activity
-              </h3>
-            </div>
-            <div className="flex-1 overflow-auto p-6">
-              <div className="relative border-l border-slate-800 ml-3 md:ml-4 flex flex-col gap-6 pb-4">
-                <div className="relative pl-6">
-                  <div className="absolute w-3 h-3 bg-indigo-500 rounded-full -left-[6.5px] top-1.5 ring-4 ring-slate-950" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-slate-200">
-                      Room created and initialized
-                    </span>
-                    <span className="text-xs text-slate-500 mt-1">
-                      {room ? new Date(room.createdAt).toLocaleString() : "Just now"}
-                    </span>
-                  </div>
-                </div>
-                <div className="relative pl-6">
-                  <div className="absolute w-3 h-3 bg-emerald-500 rounded-full -left-[6.5px] top-1.5 ring-4 ring-slate-950" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-slate-200">
-                      Owner User joined the room
-                    </span>
-                    <span className="text-xs text-slate-500 mt-1">A few moments later</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : activeTab === "whiteboard" ? (
-          <div className="flex-1 flex flex-col min-w-0 h-full">
-            <Whiteboard roomId={id} readOnly={!isOwner || room?.status === RoomStatus.ARCHIVED} />
-          </div>
-        ) : (
-          /* Other Tabs Placeholders (Settings) */
-          <div className="flex-1 border border-slate-850 bg-slate-950/40 rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-3">
-            <div className="p-3 rounded-2xl bg-indigo-600/10 text-indigo-400">
-              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                />
-              </svg>
-            </div>
-            <h3 className="text-lg font-bold text-white uppercase tracking-wide">
-              {activeTab} Placeholder
-            </h3>
-            <p className="text-xs text-slate-400 max-w-sm">
-              This panel is reserved for future {activeTab} management. Core Room Management
-              structure is active.
-            </p>
-            <Button size="sm" variant="outline" onClick={() => setActiveTab("overview")}>
-              Back to Overview
-            </Button>
-          </div>
-        )}
+        </aside>
       </div>
+
+      {/* StatusBar Footer */}
+      <footer className="h-6 bg-surface-container-highest shrink-0 flex items-center justify-between px-4 border-t border-outline-variant/30 text-code-sm font-code-sm text-outline">
+        <div className="flex items-center gap-4">
+          <span>{socketStatus === ConnectionState.CONNECTED ? "Yjs Synced" : "Disconnected"}</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span>UTF-8</span>
+          <span className="text-tertiary flex items-center gap-1">
+            <span className="material-symbols-outlined text-[14px]">group</span> {users.length}{" "}
+            Peers Active
+          </span>
+        </div>
+      </footer>
 
       {/* Edit Room Modal */}
       <EditRoomModal
@@ -597,6 +469,13 @@ export const RoomDetailPage = () => {
         room={room || null}
         onSubmit={(data) => updateRoomMutation.mutate(data)}
         isLoading={updateRoomMutation.isPending}
+      />
+
+      {/* Share Workspace Modal */}
+      <ShareWorkspaceModal
+        isOpen={isOpenShareModal}
+        onClose={() => setIsOpenShareModal(false)}
+        workspaceId={room?.workspace || ""}
       />
 
       {/* Archive / Restore Room Dialog */}
@@ -622,6 +501,8 @@ export const RoomDetailPage = () => {
         onConfirmDelete={() => deleteRoomMutation.mutate()}
         isLoading={deleteRoomMutation.isPending}
       />
+
+      <SettingsModal isOpen={isOpenSettingsModal} onClose={() => setIsOpenSettingsModal(false)} />
     </div>
   );
 };

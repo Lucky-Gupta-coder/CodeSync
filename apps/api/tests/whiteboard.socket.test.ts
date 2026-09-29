@@ -18,18 +18,7 @@ import { Workspace } from "../src/modules/workspace/workspace.model.js";
 import { Membership } from "../src/modules/workspace/membership.model.js";
 import { Room } from "../src/modules/room/room.model.js";
 
-const baseMongoUri = process.env.MONGO_URI;
-if (!baseMongoUri) {
-  throw new Error("MONGO_URI environment variable is required for tests but was not resolved.");
-}
-
-const parsedUri = new URL(baseMongoUri);
-if (parsedUri.pathname === "/" || !parsedUri.pathname) {
-  parsedUri.pathname = "/codesync_test";
-} else {
-  parsedUri.pathname = parsedUri.pathname + "_test";
-}
-const TEST_MONGO_URI = parsedUri.toString();
+import { setupTestDB, teardownTestDB } from "./setup/test-db.js";
 
 describe("Whiteboard Socket Integration Tests", () => {
   let io: Server;
@@ -44,7 +33,7 @@ describe("Whiteboard Socket Integration Tests", () => {
   let token2: string;
 
   beforeAll((done) => {
-    mongoose.connect(TEST_MONGO_URI).then(() => {
+    setupTestDB().then(() => {
       const httpServer = createServer();
       socketManager.initialize(httpServer);
       io = socketManager.getIO();
@@ -61,7 +50,7 @@ describe("Whiteboard Socket Integration Tests", () => {
     await Workspace.deleteMany({});
     await Membership.deleteMany({});
     await Room.deleteMany({});
-    await mongoose.disconnect();
+    await teardownTestDB();
   });
 
   beforeEach(async () => {
