@@ -33,11 +33,11 @@ export const DeleteRoomModal: React.FC<DeleteRoomModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Delete Room?">
       <div className="flex flex-col gap-4">
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-on-surface-variant">
           This operation is permanent and will completely remove the room from this workspace.
         </p>
 
-        <p className="text-xs text-red-400 font-semibold bg-red-500/5 border border-red-500/10 p-3.5 rounded-lg leading-relaxed">
+        <p className="text-xs text-on-error-container font-semibold bg-error-container border border-error/20 p-3.5 rounded-lg leading-relaxed">
           Please type <span className="font-bold underline select-all">{room.name}</span> to
           confirm.
         </p>

@@ -20,22 +20,22 @@ export const Card = ({
   return (
     <div
       onClick={onClick}
-      className={`rounded-2xl border border-slate-800/85 bg-slate-900/40 backdrop-blur-xl p-6 transition-all ${
-        onClick
-          ? "hover:border-indigo-500/50 hover:bg-slate-900/60 cursor-pointer shadow-lg hover:shadow-indigo-500/5"
-          : ""
+      className={`rounded-xl border border-outline-variant bg-surface p-6 shadow-sm transition-all text-on-surface ${
+        onClick ? "hover:border-primary/40 hover:bg-surface-container cursor-pointer shadow-md" : ""
       } ${className}`}
     >
       {title &&
         (typeof title === "string" ? (
-          <h3 className="text-lg font-bold text-white mb-1 tracking-tight">{title}</h3>
+          <h3 className="text-lg font-bold text-on-surface mb-1 tracking-tight">{title}</h3>
         ) : (
           title
         ))}
-      {description && <p className="text-sm text-slate-400 mb-4 line-clamp-2">{description}</p>}
-      <div className="text-slate-300">{children}</div>
+      {description && (
+        <p className="text-sm text-on-surface-variant mb-4 line-clamp-2">{description}</p>
+      )}
+      <div className="text-on-surface">{children}</div>
       {footer && (
-        <div className="mt-4 border-t border-slate-800/80 pt-4 flex items-center justify-between text-xs text-slate-500">
+        <div className="mt-4 border-t border-outline-variant pt-4 flex items-center justify-between text-xs text-on-surface-variant">
           {footer}
         </div>
       )}

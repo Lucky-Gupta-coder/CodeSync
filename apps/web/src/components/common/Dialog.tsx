@@ -27,7 +27,7 @@ export const Dialog = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="flex flex-col gap-5">
-        <p className="text-sm text-slate-400">{message}</p>
+        <p className="text-sm text-on-surface-variant">{message}</p>
         <div className="flex justify-end gap-3 mt-2">
           <Button variant="outline" size="sm" onClick={onClose} disabled={loading}>
             {cancelText}

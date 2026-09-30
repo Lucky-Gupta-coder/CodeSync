@@ -6,7 +6,7 @@ export const NotFoundPage = () => {
 
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6">
-      <div className="w-20 h-20 rounded-full bg-slate-900 flex items-center justify-center text-indigo-500 mb-6 shadow-xl border border-slate-800">
+      <div className="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center text-primary mb-6 shadow-sm border border-outline-variant">
         <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             strokeLinecap="round"
@@ -16,8 +16,10 @@ export const NotFoundPage = () => {
           />
         </svg>
       </div>
-      <h2 className="text-3xl font-black text-white mb-2 tracking-tight">404 - Page Not Found</h2>
-      <p className="text-sm text-slate-400 max-w-sm mb-8 leading-relaxed">
+      <h2 className="text-3xl font-black text-on-surface mb-2 tracking-tight">
+        404 - Page Not Found
+      </h2>
+      <p className="text-sm text-on-surface-variant max-w-sm mb-8 leading-relaxed">
         The page you are looking for does not exist or has been relocated to another directory.
       </p>
       <Button variant="primary" size="sm" onClick={() => navigate("/dashboard")}>

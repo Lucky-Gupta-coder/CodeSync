@@ -48,99 +48,123 @@ export const WhiteboardToolbar: React.FC<WhiteboardToolbarProps> = ({
   disabled = false,
 }) => {
   const tools = [
-    { id: WhiteboardTool.SELECT, label: "Select", icon: "↖" },
-    { id: WhiteboardTool.PEN, label: "Pen", icon: "✎" },
-    { id: WhiteboardTool.LINE, label: "Line", icon: "╱" },
-    { id: WhiteboardTool.RECTANGLE, label: "Rectangle", icon: "⬜" },
-    { id: WhiteboardTool.ELLIPSE, label: "Ellipse", icon: "◯" },
-    { id: WhiteboardTool.ERASER, label: "Eraser", icon: "⌫" },
+    { id: WhiteboardTool.SELECT, label: "Select", icon: "arrow_selector_tool" },
+    { id: WhiteboardTool.PEN, label: "Pen", icon: "draw" },
+    { id: WhiteboardTool.LINE, label: "Line", icon: "horizontal_rule" },
+    { id: WhiteboardTool.RECTANGLE, label: "Rectangle", icon: "square" },
+    { id: WhiteboardTool.ELLIPSE, label: "Ellipse", icon: "circle" },
+    { id: WhiteboardTool.ERASER, label: "Eraser", icon: "ink_eraser" },
   ];
 
   return (
-    <div className="flex items-center gap-2 p-2 bg-slate-900 border-b border-slate-800 shrink-0">
-      <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800">
-        {tools.map((tool) => (
-          <button
-            key={tool.id}
-            disabled={disabled}
-            onClick={() => onToolSelect(tool.id)}
-            title={tool.label}
-            className={`w-8 h-8 flex items-center justify-center rounded-md transition-colors ${
-              activeTool === tool.id
-                ? "bg-indigo-600 text-white"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            {tool.icon}
-          </button>
-        ))}
+    <div className="flex flex-wrap items-center gap-2 p-2 bg-surface-container border-b border-surface-container-highest shrink-0 shadow-sm">
+      {/* Tool Selector */}
+      <div className="flex bg-surface-container-high p-1 rounded-lg border border-outline/40 gap-0.5">
+        {tools.map((tool) => {
+          const isActive = activeTool === tool.id;
+          return (
+            <button
+              key={tool.id}
+              disabled={disabled}
+              onClick={() => onToolSelect(tool.id)}
+              title={tool.label}
+              className={`w-8 h-8 flex items-center justify-center rounded-md transition-all cursor-pointer ${
+                isActive
+                  ? "bg-indigo-600 bg-primary text-on-primary font-bold shadow-md ring-1 ring-primary/50"
+                  : "text-on-surface hover:text-on-surface hover:bg-surface-bright"
+              } disabled:opacity-40 disabled:cursor-not-allowed`}
+            >
+              <span
+                className={`material-symbols-outlined text-[18px] ${isActive ? "text-on-primary" : "text-on-surface"}`}
+              >
+                {tool.icon}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="w-px h-6 bg-slate-800 mx-1" />
+      <div className="w-px h-6 bg-outline/40 mx-1 hidden sm:block" />
 
-      {/* Color Picker */}
-      <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800 gap-1">
-        {COLORS.map((color) => (
-          <button
-            key={color}
-            disabled={disabled}
-            onClick={() => onColorSelect(color)}
-            title="Color"
-            className={`w-6 h-6 rounded-full transition-all border-2 ${
-              activeColor === color
-                ? "border-white scale-110"
-                : "border-transparent hover:scale-110"
-            }`}
-            style={{ backgroundColor: color }}
-          />
-        ))}
+      {/* Color Swatches */}
+      <div className="flex bg-surface-container-high p-1 rounded-lg border border-outline/40 gap-1.5 items-center">
+        {COLORS.map((color) => {
+          const isActive = activeColor === color;
+          return (
+            <button
+              key={color}
+              disabled={disabled}
+              onClick={() => onColorSelect(color)}
+              title="Select Color"
+              className={`w-6 h-6 rounded-full transition-all border-2 cursor-pointer shadow-sm ${
+                isActive
+                  ? "border-primary ring-2 ring-primary/40 scale-110"
+                  : "border-outline-variant hover:border-on-surface hover:scale-105"
+              }`}
+              style={{ backgroundColor: color }}
+            />
+          );
+        })}
       </div>
 
-      <div className="w-px h-6 bg-slate-800 mx-1" />
+      <div className="w-px h-6 bg-outline/40 mx-1 hidden sm:block" />
 
-      {/* Stroke Width Picker */}
-      <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800">
-        {STROKE_WIDTHS.map((width) => (
-          <button
-            key={width.value}
-            disabled={disabled}
-            onClick={() => onStrokeWidthSelect(width.value)}
-            title={`${width.label} Stroke`}
-            className={`w-8 h-8 flex items-center justify-center rounded-md transition-colors ${
-              activeStrokeWidth === width.value
-                ? "bg-slate-800 text-white"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-            } disabled:opacity-50`}
-          >
-            <span style={{ fontSize: `${width.value + 10}px` }}>{width.icon}</span>
-          </button>
-        ))}
+      {/* Stroke Width Selector */}
+      <div className="flex bg-surface-container-high p-1 rounded-lg border border-outline/40 gap-1">
+        {STROKE_WIDTHS.map((width) => {
+          const isActive = activeStrokeWidth === width.value;
+          return (
+            <button
+              key={width.value}
+              disabled={disabled}
+              onClick={() => onStrokeWidthSelect(width.value)}
+              title={`${width.label} Stroke`}
+              className={`w-8 h-8 flex items-center justify-center rounded-md transition-colors cursor-pointer text-xs font-bold ${
+                isActive
+                  ? "bg-primary text-on-primary shadow-sm"
+                  : "text-on-surface hover:bg-surface-bright"
+              } disabled:opacity-40`}
+            >
+              <span style={{ fontSize: `${width.value + 10}px` }}>{width.icon}</span>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="w-px h-6 bg-slate-800 mx-1" />
+      <div className="w-px h-6 bg-outline/40 mx-1 hidden sm:block" />
 
-      {/* Undo/Redo */}
-      <div className="flex gap-1">
+      {/* Undo/Redo Controls */}
+      <div className="flex bg-surface-container-high p-1 rounded-lg border border-outline/40 gap-1">
         <button
           onClick={onUndo}
           disabled={disabled || !canUndo}
           title="Undo"
-          className="w-8 h-8 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-md text-on-surface hover:bg-surface-bright disabled:text-on-surface-variant/40 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
-          ↶
+          <span className="material-symbols-outlined text-[18px]">undo</span>
         </button>
         <button
           onClick={onRedo}
           disabled={disabled || !canRedo}
           title="Redo"
-          className="w-8 h-8 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-md text-on-surface hover:bg-surface-bright disabled:text-on-surface-variant/40 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
-          ↷
+          <span className="material-symbols-outlined text-[18px]">redo</span>
         </button>
       </div>
 
       <div className="flex-1" />
-      <Button variant="danger" size="sm" onClick={onClear} disabled={disabled} title="Clear Canvas">
+
+      {/* Clear Canvas Action Button */}
+      <Button
+        variant="danger"
+        size="sm"
+        onClick={onClear}
+        disabled={disabled}
+        title="Clear Canvas"
+        className="h-8 text-xs font-bold px-3 shadow-sm"
+      >
+        <span className="material-symbols-outlined text-[16px] mr-1">delete</span>
         Clear
       </Button>
     </div>

@@ -6,7 +6,7 @@ export const UnauthorizedPage = () => {
 
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6">
-      <div className="w-20 h-20 rounded-full bg-slate-900 flex items-center justify-center text-red-500 mb-6 shadow-xl border border-slate-800">
+      <div className="w-20 h-20 rounded-full bg-error-container flex items-center justify-center text-error mb-6 shadow-sm border border-error/20">
         <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             strokeLinecap="round"
@@ -16,8 +16,8 @@ export const UnauthorizedPage = () => {
           />
         </svg>
       </div>
-      <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Access Denied</h2>
-      <p className="text-sm text-slate-400 max-w-sm mb-8 leading-relaxed">
+      <h2 className="text-3xl font-black text-on-surface mb-2 tracking-tight">Access Denied</h2>
+      <p className="text-sm text-on-surface-variant max-w-sm mb-8 leading-relaxed">
         You do not have the required role or permissions to access this private workspace.
       </p>
       <Button variant="primary" size="sm" onClick={() => navigate("/dashboard")}>

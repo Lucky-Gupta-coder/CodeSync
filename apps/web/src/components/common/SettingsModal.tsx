@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
 import { Modal } from "./Modal.js";
 import { Button } from "./Button.js";
 import { useAuthStore } from "../../modules/auth/store/auth.store.js";
+import { useUIStore } from "../../store/ui.store.js";
 import { useNavigate } from "react-router-dom";
 
 interface SettingsModalProps {
@@ -12,31 +12,9 @@ interface SettingsModalProps {
 export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const theme = useUIStore((state) => state.theme);
+  const toggleTheme = useUIStore((state) => state.toggleTheme);
   const navigate = useNavigate();
-
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
-
-  useEffect(() => {
-    // Check initial theme from document class
-    if (document.documentElement.classList.contains("dark")) {
-      setTheme("dark");
-    } else {
-      setTheme("light");
-    }
-  }, []);
-
-  const handleThemeToggle = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  };
 
   const handleLogout = () => {
     logout();
@@ -70,8 +48,8 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                 <div className="text-body-sm text-outline">Toggle between Light and Dark mode</div>
               </div>
               <button
-                onClick={handleThemeToggle}
-                className="w-12 h-6 rounded-full bg-surface-container-highest relative transition-colors focus:outline-none"
+                onClick={toggleTheme}
+                className="w-12 h-6 rounded-full bg-surface-container-highest relative transition-colors focus:outline-none cursor-pointer"
               >
                 <div
                   className={`w-5 h-5 rounded-full absolute top-0.5 transition-transform duration-200 flex items-center justify-center ${

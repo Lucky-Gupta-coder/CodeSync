@@ -42,12 +42,12 @@ export const RoomCard: React.FC<RoomCardProps> = ({
     return (
       <div
         onClick={onClick}
-        className={`group border border-slate-850 bg-slate-900/40 hover:bg-slate-900/80 hover:border-indigo-500/40 rounded-xl p-4 transition-all duration-200 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-          isArchived ? "opacity-75 bg-slate-950/40" : ""
+        className={`group border border-outline-variant bg-surface hover:bg-surface-container hover:border-primary/40 rounded-xl p-4 transition-all duration-200 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm ${
+          isArchived ? "opacity-75 bg-surface-container" : ""
         }`}
       >
         <div className="flex items-start md:items-center gap-3.5 flex-1 min-w-0">
-          <div className="p-2.5 rounded-lg bg-indigo-600/10 text-indigo-400 group-hover:scale-105 transition-transform shrink-0">
+          <div className="p-2.5 rounded-lg bg-primary/10 text-primary group-hover:scale-105 transition-transform shrink-0">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -59,7 +59,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="text-base font-bold text-slate-100 group-hover:text-indigo-400 transition-colors truncate">
+              <h4 className="text-base font-bold text-on-surface group-hover:text-primary transition-colors truncate">
                 {room.name}
               </h4>
               <LanguageBadge language={room.language} size="sm" />
@@ -69,21 +69,21 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                 </Badge>
               )}
             </div>
-            <p className="text-xs text-slate-400 mt-1 line-clamp-1">
+            <p className="text-xs text-on-surface-variant mt-1 line-clamp-1">
               {room.description || "No description provided."}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4 shrink-0 justify-between md:justify-end border-t md:border-t-0 pt-2 md:pt-0 border-slate-850">
-          <div className="flex items-center gap-3 text-xs text-slate-500">
+        <div className="flex items-center gap-4 shrink-0 justify-between md:justify-end border-t md:border-t-0 pt-2 md:pt-0 border-outline-variant">
+          <div className="flex items-center gap-3 text-xs text-muted">
             <div className="flex items-center gap-1.5" title={`Owner ID: ${room.owner}`}>
               <Avatar name="Owner" size="sm" />
-              <span className="hidden lg:inline text-slate-400 font-medium">Owner</span>
+              <span className="hidden lg:inline text-on-surface-variant font-medium">Owner</span>
             </div>
-            <span className="text-slate-700">•</span>
+            <span className="text-muted">•</span>
             <span title="Created date">Created {formatDate(room.createdAt)}</span>
-            <span className="text-slate-700">•</span>
+            <span className="text-muted">•</span>
             <span title="Last updated">Updated {formatDate(room.updatedAt)}</span>
           </div>
 
@@ -93,7 +93,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
                 <button
                   onClick={onEdit}
                   disabled={isArchived}
-                  className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Edit Room"
                   aria-label="Edit Room"
                 >
@@ -110,7 +110,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               {onArchive && (
                 <button
                   onClick={onArchive}
-                  className="p-1.5 text-slate-400 hover:text-amber-400 hover:bg-slate-800 rounded-lg transition-colors"
+                  className="p-1.5 text-on-surface-variant hover:text-warning hover:bg-surface-container rounded-lg transition-colors"
                   title={isArchived ? "Restore Room" : "Archive Room"}
                   aria-label={isArchived ? "Restore Room" : "Archive Room"}
                 >
@@ -127,7 +127,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               {onDelete && (
                 <button
                   onClick={onDelete}
-                  className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-colors"
+                  className="p-1.5 text-on-surface-variant hover:text-error hover:bg-surface-container rounded-lg transition-colors"
                   title="Delete Room"
                   aria-label="Delete Room"
                 >
@@ -151,14 +151,14 @@ export const RoomCard: React.FC<RoomCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`group border border-slate-850 bg-slate-900/40 hover:bg-slate-900/80 hover:border-indigo-500/40 rounded-2xl p-5 flex flex-col justify-between gap-4 transition-all duration-200 cursor-pointer ${
-        isArchived ? "opacity-75 bg-slate-950/40" : ""
+      className={`group border border-outline-variant bg-surface hover:bg-surface-container hover:border-primary/40 rounded-2xl p-5 flex flex-col justify-between gap-4 transition-all duration-200 cursor-pointer shadow-sm ${
+        isArchived ? "opacity-75 bg-surface-container" : ""
       }`}
     >
       <div>
         <div className="flex items-start justify-between gap-3 mb-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="text-lg font-bold text-slate-100 group-hover:text-indigo-400 transition-colors tracking-tight line-clamp-1">
+            <h4 className="text-lg font-bold text-on-surface group-hover:text-primary transition-colors tracking-tight line-clamp-1">
               {room.name}
             </h4>
             {isArchived && (
@@ -170,17 +170,17 @@ export const RoomCard: React.FC<RoomCardProps> = ({
           <LanguageBadge language={room.language} size="sm" />
         </div>
 
-        <p className="text-xs text-slate-400 leading-relaxed line-clamp-2 min-h-[2.25rem]">
+        <p className="text-xs text-on-surface-variant leading-relaxed line-clamp-2 min-h-[2.25rem]">
           {room.description || "No description provided for this coding room."}
         </p>
       </div>
 
-      <div className="pt-3 border-t border-slate-850/80 flex items-center justify-between text-xs text-slate-500">
+      <div className="pt-3 border-t border-outline-variant flex items-center justify-between text-xs text-muted">
         <div className="flex items-center gap-2">
           <Avatar name="Owner" size="sm" />
           <div className="flex flex-col">
-            <span className="text-[11px] font-semibold text-slate-300">Workspace Member</span>
-            <span className="text-[10px] text-slate-500">Updated {formatDate(room.updatedAt)}</span>
+            <span className="text-[11px] font-semibold text-on-surface">Workspace Member</span>
+            <span className="text-[10px] text-muted">Updated {formatDate(room.updatedAt)}</span>
           </div>
         </div>
 
@@ -190,7 +190,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
               <button
                 onClick={onEdit}
                 disabled={isArchived}
-                className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 title="Edit Room"
                 aria-label="Edit Room"
               >

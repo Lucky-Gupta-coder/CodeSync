@@ -12,9 +12,9 @@ interface LanguageConfig {
 const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
   [RoomLanguage.JAVASCRIPT]: {
     displayName: "JavaScript",
-    bgClass: "bg-yellow-500/10",
-    textClass: "text-yellow-400",
-    borderClass: "border-yellow-500/20",
+    bgClass: "bg-amber-500/10",
+    textClass: "text-amber-700 dark:text-amber-400",
+    borderClass: "border-amber-500/20",
     icon: (
       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
         <path d="M3 3h18v18H3V3zm10.5 12.5c0-.83.67-1.5 1.5-1.5.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5c-.83 0-1.5-.67-1.5-1.5zm-5 0c0-.83.67-1.5 1.5-1.5.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5c-.83 0-1.5-.67-1.5-1.5z" />
@@ -24,7 +24,7 @@ const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
   [RoomLanguage.TYPESCRIPT]: {
     displayName: "TypeScript",
     bgClass: "bg-blue-500/10",
-    textClass: "text-blue-400",
+    textClass: "text-blue-700 dark:text-blue-400",
     borderClass: "border-blue-500/20",
     icon: (
       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -35,7 +35,7 @@ const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
   [RoomLanguage.PYTHON]: {
     displayName: "Python",
     bgClass: "bg-emerald-500/10",
-    textClass: "text-emerald-400",
+    textClass: "text-emerald-700 dark:text-emerald-400",
     borderClass: "border-emerald-500/20",
     icon: (
       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -46,7 +46,7 @@ const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
   [RoomLanguage.JAVA]: {
     displayName: "Java",
     bgClass: "bg-orange-500/10",
-    textClass: "text-orange-400",
+    textClass: "text-orange-700 dark:text-orange-400",
     borderClass: "border-orange-500/20",
     icon: (
       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -57,7 +57,7 @@ const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
   [RoomLanguage.CPP]: {
     displayName: "C++",
     bgClass: "bg-cyan-500/10",
-    textClass: "text-cyan-400",
+    textClass: "text-cyan-700 dark:text-cyan-400",
     borderClass: "border-cyan-500/20",
     icon: (
       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -68,7 +68,7 @@ const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
   [RoomLanguage.C]: {
     displayName: "C",
     bgClass: "bg-slate-500/10",
-    textClass: "text-slate-300",
+    textClass: "text-slate-700 dark:text-slate-300",
     borderClass: "border-slate-500/20",
     icon: (
       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -79,7 +79,7 @@ const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
   [RoomLanguage.GO]: {
     displayName: "Go",
     bgClass: "bg-sky-500/10",
-    textClass: "text-sky-400",
+    textClass: "text-sky-700 dark:text-sky-400",
     borderClass: "border-sky-500/20",
     icon: (
       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -90,7 +90,7 @@ const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
   [RoomLanguage.RUST]: {
     displayName: "Rust",
     bgClass: "bg-amber-600/10",
-    textClass: "text-amber-400",
+    textClass: "text-amber-800 dark:text-amber-400",
     borderClass: "border-amber-600/20",
     icon: (
       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -101,7 +101,7 @@ const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
   kotlin: {
     displayName: "Kotlin",
     bgClass: "bg-purple-500/10",
-    textClass: "text-purple-400",
+    textClass: "text-purple-700 dark:text-purple-400",
     borderClass: "border-purple-500/20",
     icon: (
       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -112,7 +112,7 @@ const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
   swift: {
     displayName: "Swift",
     bgClass: "bg-rose-500/10",
-    textClass: "text-rose-400",
+    textClass: "text-rose-700 dark:text-rose-400",
     borderClass: "border-rose-500/20",
     icon: (
       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -123,7 +123,7 @@ const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
   other: {
     displayName: "Other",
     bgClass: "bg-indigo-500/10",
-    textClass: "text-indigo-400",
+    textClass: "text-indigo-700 dark:text-indigo-400",
     borderClass: "border-indigo-500/20",
     icon: (
       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">

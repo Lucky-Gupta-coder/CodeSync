@@ -19,7 +19,7 @@ export const Pagination = ({ currentPage, totalPages, onPageChange }: Pagination
       >
         Previous
       </Button>
-      <span className="text-sm font-semibold text-slate-400">
+      <span className="text-sm font-semibold text-on-surface-variant">
         Page {currentPage} of {totalPages}
       </span>
       <Button

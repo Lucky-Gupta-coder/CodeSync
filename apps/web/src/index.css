@@ -1,129 +1,184 @@
 @import "tailwindcss";
 
+:root,
+html.dark {
+  color-scheme: dark;
+  --cs-bg: #0b0f17;
+  --cs-surface: #111722;
+  --cs-surface-container: #171e2c;
+  --cs-surface-container-high: #1e2638;
+  --cs-surface-container-highest: #283246;
+  --cs-surface-container-low: #0e131d;
+  --cs-surface-container-lowest: #070a10;
+  --cs-surface-bright: #2c374e;
+  --cs-surface-dim: #0b0f17;
+  --cs-surface-variant: #1e2638;
+  --cs-on-surface: #e2e8f0;
+  --cs-on-surface-variant: #94a3b8;
+  --cs-on-background: #e2e8f0;
+  --cs-muted: #64748b;
+  --cs-outline: #334155;
+  --cs-outline-variant: #1e293b;
+  --cs-primary: #8b5cf6;
+  --cs-primary-container: #4c1d95;
+  --cs-primary-fixed: #ddd6fe;
+  --cs-primary-fixed-dim: #c4b5fd;
+  --cs-on-primary: #ffffff;
+  --cs-on-primary-container: #ede9fe;
+  --cs-on-primary-fixed: #1e1b4b;
+  --cs-on-primary-fixed-variant: #3730a3;
+  --cs-secondary: #06b6d4;
+  --cs-secondary-container: #164e63;
+  --cs-secondary-fixed: #cffafe;
+  --cs-secondary-fixed-dim: #67e8f9;
+  --cs-on-secondary: #ffffff;
+  --cs-on-secondary-container: #cffafe;
+  --cs-on-secondary-fixed: #083344;
+  --cs-on-secondary-fixed-variant: #155e75;
+  --cs-tertiary: #10b981;
+  --cs-tertiary-container: #064e3b;
+  --cs-tertiary-fixed: #d1fae5;
+  --cs-tertiary-fixed-dim: #6ee7b7;
+  --cs-on-tertiary: #ffffff;
+  --cs-on-tertiary-container: #d1fae5;
+  --cs-on-tertiary-fixed: #022c22;
+  --cs-on-tertiary-fixed-variant: #065f46;
+  --cs-error: #ef4444;
+  --cs-error-container: #7f1d1d;
+  --cs-on-error: #ffffff;
+  --cs-on-error-container: #fee2e2;
+  --cs-warning: #f59e0b;
+  --cs-warning-container: #78350f;
+  --cs-on-warning: #fef3c7;
+  --cs-inverse-surface: #e2e8f0;
+  --cs-inverse-on-surface: #0f172a;
+  --cs-inverse-primary: #7c3aed;
+  --cs-surface-tint: #8b5cf6;
+}
+
+html.light {
+  color-scheme: light;
+  --cs-bg: #f6f7fb;
+  --cs-surface: #ffffff;
+  --cs-surface-container: #f8f9fc;
+  --cs-surface-container-high: #f1f3f8;
+  --cs-surface-container-highest: #e2e5ec;
+  --cs-surface-container-low: #ffffff;
+  --cs-surface-container-lowest: #f6f7fb;
+  --cs-surface-bright: #ffffff;
+  --cs-surface-dim: #f8f9fc;
+  --cs-surface-variant: #f1f3f8;
+  --cs-on-surface: #171a24;
+  --cs-on-surface-variant: #596174;
+  --cs-on-background: #171a24;
+  --cs-muted: #7a8294;
+  --cs-outline: #d5d9e2;
+  --cs-outline-variant: #e2e5ec;
+  --cs-primary: #5b4bdb;
+  --cs-primary-container: #5b4bdb;
+  --cs-primary-fixed: #eeebff;
+  --cs-primary-fixed-dim: #4c3cc7;
+  --cs-on-primary: #ffffff;
+  --cs-on-primary-container: #ffffff;
+  --cs-on-primary-fixed: #171a24;
+  --cs-on-primary-fixed-variant: #5b4bdb;
+  --cs-secondary: #2563eb;
+  --cs-secondary-container: #eaf2ff;
+  --cs-secondary-fixed: #eaf2ff;
+  --cs-secondary-fixed-dim: #2563eb;
+  --cs-on-secondary: #ffffff;
+  --cs-on-secondary-container: #1d4ed8;
+  --cs-on-secondary-fixed: #171a24;
+  --cs-on-secondary-fixed-variant: #2563eb;
+  --cs-tertiary: #0e9f6e;
+  --cs-tertiary-container: #e8f8f1;
+  --cs-tertiary-fixed: #e8f8f1;
+  --cs-tertiary-fixed-dim: #0e9f6e;
+  --cs-on-tertiary: #ffffff;
+  --cs-on-tertiary-container: #087a55;
+  --cs-on-tertiary-fixed: #087a55;
+  --cs-on-tertiary-fixed-variant: #087a55;
+  --cs-error: #dc3545;
+  --cs-error-container: #fdebec;
+  --cs-on-error: #ffffff;
+  --cs-on-error-container: #b42332;
+  --cs-warning: #d97706;
+  --cs-warning-container: #fff4df;
+  --cs-on-warning: #b45309;
+  --cs-inverse-surface: #171a24;
+  --cs-inverse-on-surface: #f6f7fb;
+  --cs-inverse-primary: #5b4bdb;
+  --cs-surface-tint: #5b4bdb;
+}
+
 @theme {
-  --color-surface-container-highest: #31353c;
-  --color-tertiary-fixed-dim: #4edea3;
-  --color-on-surface-variant: #bbc9cf;
-  --color-on-tertiary-fixed: #002113;
-  --color-inverse-surface: #dfe2eb;
-  --color-tertiary-container: #48d99e;
-  --color-background: #10141a;
-  --color-on-secondary-container: #00374d;
-  --color-on-tertiary-fixed-variant: #005236;
-  --color-error: #ffb4ab;
-  --color-surface-container-high: #262a31;
-  --color-primary-container: #00d2ff;
-  --color-secondary-fixed: #c4e7ff;
-  --color-surface-container-low: #181c22;
-  --color-on-secondary-fixed-variant: #004c69;
-  --color-surface-dim: #10141a;
-  --color-outline-variant: #3c494e;
-  --color-secondary: #7bd0ff;
-  --color-error-container: #93000a;
-  --color-inverse-primary: #00677f;
-  --color-tertiary-fixed: #6ffbbe;
-  --color-primary-fixed-dim: #47d6ff;
-  --color-surface-tint: #47d6ff;
-  --color-on-primary: #003543;
-  --color-on-secondary-fixed: #001e2c;
-  --color-on-error: #690005;
-  --color-primary: #a5e7ff;
-  --color-on-error-container: #ffdad6;
-  --color-surface-variant: #31353c;
-  --color-surface-container-lowest: #0a0e14;
-  --color-on-primary-fixed-variant: #004e60;
-  --color-on-secondary: #00354a;
-  --color-surface: #10141a;
-  --color-secondary-container: #00a6e0;
-  --color-on-primary-container: #00566a;
-  --color-surface-container: #1c2026;
-  --color-on-tertiary-container: #005b3d;
-  --color-surface-bright: #353940;
-  --color-secondary-fixed-dim: #7bd0ff;
-  --color-outline: #859399;
-  --color-inverse-on-surface: #2d3137;
-  --color-on-primary-fixed: #001f28;
-  --color-on-background: #dfe2eb;
-  --color-on-surface: #dfe2eb;
-  --color-tertiary: #69f6b9;
-  --color-primary-fixed: #b6ebff;
-  --color-on-tertiary: #003824;
+  --color-surface-container-highest: var(--cs-surface-container-highest);
+  --color-tertiary-fixed-dim: var(--cs-tertiary-fixed-dim);
+  --color-on-surface-variant: var(--cs-on-surface-variant);
+  --color-on-tertiary-fixed: var(--cs-on-tertiary-fixed);
+  --color-inverse-surface: var(--cs-inverse-surface);
+  --color-tertiary-container: var(--cs-tertiary-container);
+  --color-background: var(--cs-bg);
+  --color-on-secondary-container: var(--cs-on-secondary-container);
+  --color-on-tertiary-fixed-variant: var(--cs-on-tertiary-fixed-variant);
+  --color-error: var(--cs-error);
+  --color-surface-container-high: var(--cs-surface-container-high);
+  --color-primary-container: var(--cs-primary-container);
+  --color-secondary-fixed: var(--cs-secondary-fixed);
+  --color-surface-container-low: var(--cs-surface-container-low);
+  --color-on-secondary-fixed-variant: var(--cs-on-secondary-fixed-variant);
+  --color-surface-dim: var(--cs-surface-dim);
+  --color-outline-variant: var(--cs-outline-variant);
+  --color-secondary: var(--cs-secondary);
+  --color-error-container: var(--cs-error-container);
+  --color-inverse-primary: var(--cs-inverse-primary);
+  --color-tertiary-fixed: var(--cs-tertiary-fixed);
+  --color-primary-fixed-dim: var(--cs-primary-fixed-dim);
+  --color-surface-tint: var(--cs-surface-tint);
+  --color-on-primary: var(--cs-on-primary);
+  --color-on-secondary-fixed: var(--cs-on-secondary-fixed);
+  --color-on-error: var(--cs-on-error);
+  --color-primary: var(--cs-primary);
+  --color-on-error-container: var(--cs-on-error-container);
+  --color-surface-variant: var(--cs-surface-variant);
+  --color-surface-container-lowest: var(--cs-surface-container-lowest);
+  --color-on-primary-fixed-variant: var(--cs-on-primary-fixed-variant);
+  --color-on-secondary: var(--cs-on-secondary);
+  --color-surface: var(--cs-surface);
+  --color-secondary-container: var(--cs-secondary-container);
+  --color-on-primary-container: var(--cs-on-primary-container);
+  --color-surface-container: var(--cs-surface-container);
+  --color-on-tertiary-container: var(--cs-on-tertiary-container);
+  --color-surface-bright: var(--cs-surface-bright);
+  --color-secondary-fixed-dim: var(--cs-secondary-fixed-dim);
+  --color-outline: var(--cs-outline);
+  --color-inverse-on-surface: var(--cs-inverse-on-surface);
+  --color-on-primary-fixed: var(--cs-on-primary-fixed);
+  --color-on-background: var(--cs-on-background);
+  --color-on-surface: var(--cs-on-surface);
+  --color-tertiary: var(--cs-tertiary);
+  --color-primary-fixed: var(--cs-primary-fixed);
+  --color-on-tertiary: var(--cs-on-tertiary);
+  --color-muted: var(--cs-muted);
+  --color-warning: var(--cs-warning);
+  --color-warning-container: var(--cs-warning-container);
+  --color-on-warning: var(--cs-on-warning);
 
-  --radius-DEFAULT: 0.125rem;
-  --radius-lg: 0.25rem;
+  --radius-DEFAULT: 0.25rem;
+  --radius-lg: 0.375rem;
   --radius-xl: 0.5rem;
-  --radius-full: 0.75rem;
-
-  --spacing-margin: 0.5rem;
-  --spacing-space-md: 0.75rem;
-  --spacing-space-lg: 1rem;
-  --spacing-space-xs: 0.25rem;
-  --spacing-space-sm: 0.5rem;
-  --spacing-gutter: 1px;
-  --spacing-space-xl: 1.5rem;
+  --radius-full: 9999px;
 
   --font-label-md: "JetBrains Mono", monospace;
   --font-code-sm: "JetBrains Mono", monospace;
-  --font-body-sm: "Geist", sans-serif;
+  --font-body-sm: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-code-md: "JetBrains Mono", monospace;
-  --font-headline-md: "Geist", sans-serif;
-  --font-headline-sm: "Geist", sans-serif;
-  --font-body-md: "Geist", sans-serif;
-  --font-headline-lg: "Geist", sans-serif;
+  --font-headline-md: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-headline-sm: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body-md: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-headline-lg: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-label-sm: "JetBrains Mono", monospace;
-  --font-headline-lg-mobile: "Geist", sans-serif;
-  --font-body-lg: "Geist", sans-serif;
-
-  --text-label-md: 0.75rem;
-  --text-label-md--line-height: 1rem;
-  --text-label-md--letter-spacing: 0.02em;
-  --text-label-md--font-weight: 500;
-
-  --text-code-sm: 0.75rem;
-  --text-code-sm--line-height: 1.25rem;
-  --text-code-sm--font-weight: 400;
-
-  --text-body-sm: 0.8125rem;
-  --text-body-sm--line-height: 1.25rem;
-  --text-body-sm--font-weight: 400;
-
-  --text-code-md: 0.875rem;
-  --text-code-md--line-height: 1.5rem;
-  --text-code-md--font-weight: 400;
-
-  --text-headline-md: 1.25rem;
-  --text-headline-md--line-height: 1.75rem;
-  --text-headline-md--letter-spacing: -0.015em;
-  --text-headline-md--font-weight: 600;
-
-  --text-headline-sm: 1rem;
-  --text-headline-sm--line-height: 1.5rem;
-  --text-headline-sm--letter-spacing: -0.01em;
-  --text-headline-sm--font-weight: 600;
-
-  --text-body-md: 0.875rem;
-  --text-body-md--line-height: 1.375rem;
-  --text-body-md--font-weight: 400;
-
-  --text-headline-lg: 1.5rem;
-  --text-headline-lg--line-height: 2rem;
-  --text-headline-lg--letter-spacing: -0.02em;
-  --text-headline-lg--font-weight: 600;
-
-  --text-label-sm: 0.6875rem;
-  --text-label-sm--line-height: 0.875rem;
-  --text-label-sm--letter-spacing: 0.04em;
-  --text-label-sm--font-weight: 500;
-
-  --text-headline-lg-mobile: 1.25rem;
-  --text-headline-lg-mobile--line-height: 1.75rem;
-  --text-headline-lg-mobile--letter-spacing: -0.015em;
-  --text-headline-lg-mobile--font-weight: 600;
-
-  --text-body-lg: 0.9375rem;
-  --text-body-lg--line-height: 1.5rem;
-  --text-body-lg--letter-spacing: -0.005em;
-  --text-body-lg--font-weight: 400;
+  --font-body-lg: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 @layer base {
@@ -134,7 +189,9 @@
   }
   body {
     overscroll-behavior: none;
-    @apply bg-surface text-on-surface font-body-md antialiased;
+    background-color: var(--cs-bg);
+    color: var(--cs-on-surface);
+    @apply font-body-md antialiased transition-colors duration-200;
   }
   main > :first-child {
     margin-top: 0 !important;
@@ -145,5 +202,13 @@
 }
 
 ::-webkit-scrollbar {
-  display: none;
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cs-outline);
+  border-radius: 3px;
 }

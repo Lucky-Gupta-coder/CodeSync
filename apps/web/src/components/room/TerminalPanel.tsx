@@ -52,7 +52,9 @@ export const TerminalPanel = ({ roomId, ytext, language }: TerminalPanelProps) =
           <button
             onClick={handleRun}
             disabled={
-              isExecuting || !ytext || (language !== "javascript" && language !== "typescript")
+              isExecuting ||
+              !ytext ||
+              !["javascript", "typescript", "python", "java"].includes(language.toLowerCase())
             }
             className="flex items-center gap-1 text-[11px] px-2 py-1 bg-primary text-on-primary rounded hover:bg-primary/90 disabled:opacity-50 transition-colors"
           >

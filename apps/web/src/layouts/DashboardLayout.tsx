@@ -92,21 +92,21 @@ export const DashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-slate-950 text-slate-100">
+    <div className="min-h-screen flex bg-background text-on-surface">
       {/* Sidebar - Desktop */}
       <aside
-        className={`hidden md:flex flex-col border-r border-slate-900 bg-slate-950 transition-all duration-300 ${
+        className={`hidden md:flex flex-col border-r border-outline-variant bg-surface transition-all duration-300 ${
           sidebarCollapsed ? "w-16" : "w-64"
         }`}
       >
         {/* Brand logo */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-slate-900">
+        <div className="flex h-16 items-center justify-between px-4 border-b border-outline-variant">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-black text-white text-base shadow-lg shadow-indigo-600/30 shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-black text-on-primary text-base shadow-md shrink-0">
               CS
             </div>
             {!sidebarCollapsed && (
-              <span className="text-lg font-bold tracking-tight text-white animate-fade-in whitespace-nowrap">
+              <span className="text-lg font-bold tracking-tight text-on-surface animate-fade-in whitespace-nowrap">
                 CodeSync
               </span>
             )}
@@ -120,10 +120,10 @@ export const DashboardLayout = () => {
               key={link.to}
               to={link.to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-slate-900 ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-surface-container-high ${
                   isActive
-                    ? "bg-indigo-600/10 text-indigo-400 hover:bg-indigo-600/15"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-primary/10 text-primary hover:bg-primary/15"
+                    : "text-on-surface-variant hover:text-on-surface"
                 }`
               }
             >
@@ -134,16 +134,16 @@ export const DashboardLayout = () => {
         </nav>
 
         {/* User Info footer */}
-        <div className="border-t border-slate-900 p-4">
+        <div className="border-t border-outline-variant p-4">
           <div className="flex items-center justify-between gap-3 overflow-hidden">
             <div className="flex items-center gap-3 shrink-0">
               <Avatar name={user?.name || "User"} size="sm" />
               {!sidebarCollapsed && (
                 <div className="flex flex-col overflow-hidden max-w-[120px]">
-                  <span className="text-xs font-semibold text-slate-200 truncate">
+                  <span className="text-xs font-semibold text-on-surface truncate">
                     {user?.name || "User"}
                   </span>
-                  <span className="text-[10px] text-slate-500 truncate">
+                  <span className="text-[10px] text-on-surface-variant truncate">
                     {user?.email || "user@example.com"}
                   </span>
                 </div>
@@ -152,7 +152,7 @@ export const DashboardLayout = () => {
             {!sidebarCollapsed && (
               <button
                 onClick={handleLogout}
-                className="text-slate-500 hover:text-red-400 rounded p-1 transition-all cursor-pointer"
+                className="text-on-surface-variant hover:text-error rounded p-1 transition-all cursor-pointer"
                 title="Logout"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -174,21 +174,21 @@ export const DashboardLayout = () => {
         <div className="fixed inset-0 z-50 md:hidden flex">
           {/* Overlay backdrop */}
           <div
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm"
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
 
-          <aside className="relative flex flex-col w-64 bg-slate-950 border-r border-slate-900 animate-slide-in-left duration-250">
-            <div className="flex h-16 items-center px-4 border-b border-slate-900 justify-between">
+          <aside className="relative flex flex-col w-64 bg-surface border-r border-outline-variant animate-slide-in-left duration-250">
+            <div className="flex h-16 items-center px-4 border-b border-outline-variant justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-black text-white text-base shadow-lg shadow-indigo-600/30">
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-black text-on-primary text-base shadow-md">
                   CS
                 </div>
-                <span className="text-lg font-bold tracking-tight text-white">CodeSync</span>
+                <span className="text-lg font-bold tracking-tight text-on-surface">CodeSync</span>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}
-                className="text-slate-400 hover:text-white cursor-pointer"
+                className="text-on-surface-variant hover:text-on-surface cursor-pointer"
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -209,10 +209,10 @@ export const DashboardLayout = () => {
                   key={link.to}
                   to={link.to}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-slate-900 ${
+                    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all hover:bg-surface-container-high ${
                       isActive
-                        ? "bg-indigo-600/10 text-indigo-400"
-                        : "text-slate-400 hover:text-white"
+                        ? "bg-primary/10 text-primary"
+                        : "text-on-surface-variant hover:text-on-surface"
                     }`
                   }
                 >
@@ -221,19 +221,21 @@ export const DashboardLayout = () => {
                 </NavLink>
               ))}
             </nav>
-            <div className="border-t border-slate-900 p-4 flex items-center justify-between">
+            <div className="border-t border-outline-variant p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar name={user?.name || "User"} size="sm" />
                 <div className="flex flex-col max-w-[120px]">
-                  <span className="text-xs font-semibold text-slate-200 truncate">
+                  <span className="text-xs font-semibold text-on-surface truncate">
                     {user?.name}
                   </span>
-                  <span className="text-[10px] text-slate-500 truncate">{user?.email}</span>
+                  <span className="text-[10px] text-on-surface-variant truncate">
+                    {user?.email}
+                  </span>
                 </div>
               </div>
               <button
                 onClick={handleLogout}
-                className="text-slate-500 hover:text-red-400 cursor-pointer"
+                className="text-on-surface-variant hover:text-error cursor-pointer"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -252,12 +254,12 @@ export const DashboardLayout = () => {
       {/* Main container wrapper */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Navbar */}
-        <header className="h-16 border-b border-slate-900 bg-slate-950/80 backdrop-blur flex items-center justify-between px-4 md:px-6 relative z-30">
+        <header className="h-16 border-b border-outline-variant bg-surface/80 backdrop-blur flex items-center justify-between px-4 md:px-6 relative z-30">
           <div className="flex items-center gap-3">
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileOpen(true)}
-              className="md:hidden text-slate-400 hover:text-white p-1 hover:bg-slate-900 rounded-lg transition-all cursor-pointer"
+              className="md:hidden text-on-surface-variant hover:text-on-surface p-1 hover:bg-surface-container-high rounded-lg transition-all cursor-pointer"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -272,7 +274,7 @@ export const DashboardLayout = () => {
             {/* Desktop collapse toggle */}
             <button
               onClick={toggleSidebar}
-              className="hidden md:block text-slate-400 hover:text-white p-1 hover:bg-slate-900 rounded-lg transition-all cursor-pointer"
+              className="hidden md:block text-on-surface-variant hover:text-on-surface p-1 hover:bg-surface-container-high rounded-lg transition-all cursor-pointer"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {sidebarCollapsed ? (
@@ -293,18 +295,25 @@ export const DashboardLayout = () => {
               </svg>
             </button>
 
-            <h1 className="text-base font-bold text-white md:text-lg pl-1">{getScreenTitle()}</h1>
+            <h1 className="text-base font-bold text-on-surface md:text-lg pl-1">
+              {getScreenTitle()}
+            </h1>
           </div>
 
           {/* Theme toggler and user info */}
           <div className="flex items-center gap-4">
             <button
               onClick={toggleTheme}
-              className="text-slate-400 hover:text-white p-1.5 hover:bg-slate-900 rounded-lg transition-all cursor-pointer"
+              className="text-on-surface-variant hover:text-on-surface p-1.5 hover:bg-surface-container-high rounded-lg transition-all cursor-pointer"
               title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
             >
               {theme === "dark" ? (
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg
+                  className="h-5 w-5 text-amber-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -313,7 +322,12 @@ export const DashboardLayout = () => {
                   />
                 </svg>
               ) : (
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg
+                  className="h-5 w-5 text-indigo-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -323,9 +337,9 @@ export const DashboardLayout = () => {
                 </svg>
               )}
             </button>
-            <div className="flex items-center gap-2 border-l border-slate-900 pl-4">
+            <div className="flex items-center gap-2 border-l border-outline-variant pl-4">
               <Avatar name={user?.name || "User"} size="sm" />
-              <span className="text-xs font-semibold text-slate-300 hidden sm:inline">
+              <span className="text-xs font-semibold text-on-surface hidden sm:inline">
                 {user?.name}
               </span>
             </div>
@@ -333,7 +347,7 @@ export const DashboardLayout = () => {
         </header>
 
         {/* Nested child views content area */}
-        <main className="flex-1 overflow-y-auto bg-slate-950 p-6 md:p-8 relative">
+        <main className="flex-1 overflow-y-auto bg-background p-6 md:p-8 relative">
           <Outlet />
         </main>
       </div>

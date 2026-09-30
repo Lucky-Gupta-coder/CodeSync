@@ -15,11 +15,11 @@ export const Badge = ({
   const baseStyle = "inline-flex items-center font-semibold rounded-full tracking-wider uppercase";
 
   const variants = {
-    primary: "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20",
-    secondary: "bg-slate-800 text-slate-300 border border-slate-700",
-    success: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-    danger: "bg-red-500/10 text-red-400 border border-red-500/20",
-    warning: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
+    primary: "bg-primary-fixed text-on-primary-fixed-variant border border-primary/20",
+    secondary: "bg-surface-container-high text-on-surface-variant border border-outline-variant",
+    success: "bg-tertiary-container text-on-tertiary-container border border-tertiary/20",
+    danger: "bg-error-container text-on-error-container border border-error/20",
+    warning: "bg-warning-container text-on-warning border border-warning/20",
   };
 
   const sizes = {

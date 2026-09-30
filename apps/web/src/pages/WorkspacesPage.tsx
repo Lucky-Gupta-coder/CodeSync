@@ -173,8 +173,10 @@ export const WorkspacesPage = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-white mb-1">Workspaces</h2>
-          <p className="text-sm text-slate-400">Manage your collaborative coding workspaces</p>
+          <h2 className="text-2xl font-black tracking-tight text-on-surface mb-1">Workspaces</h2>
+          <p className="text-sm text-on-surface-variant">
+            Manage your collaborative coding workspaces
+          </p>
         </div>
         <Button size="sm" onClick={() => setIsOpen(true)}>
           New Workspace
@@ -182,7 +184,7 @@ export const WorkspacesPage = () => {
       </div>
 
       {/* Filtering, Search & View Controls */}
-      <div className="flex flex-col gap-4 border-b border-slate-900 pb-5">
+      <div className="flex flex-col gap-4 border-b border-outline-variant pb-5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <SearchBar
             value={search}
@@ -193,11 +195,11 @@ export const WorkspacesPage = () => {
           <div className="flex flex-wrap items-center gap-3">
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500 font-semibold uppercase">Sort:</span>
+              <span className="text-xs text-on-surface-variant font-semibold uppercase">Sort:</span>
               <select
                 value={sortParam}
                 onChange={(e) => updateParams({ sort: e.target.value, page: 1 })}
-                className="bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                className="bg-surface border border-outline-variant text-xs text-on-surface rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
               >
                 <option value="newest">Newest</option>
                 <option value="oldest">Oldest</option>
@@ -207,15 +209,15 @@ export const WorkspacesPage = () => {
             </div>
 
             {/* Visibility Filters */}
-            <div className="flex items-center border border-slate-850 rounded-lg p-0.5 bg-slate-900/50">
+            <div className="flex items-center border border-outline-variant rounded-lg p-0.5 bg-surface-container">
               {["all", "public", "private"].map((v) => (
                 <button
                   key={v}
                   onClick={() => updateParams({ visibility: v, page: 1 })}
                   className={`px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                     visibilityParam === v
-                      ? "bg-indigo-600/10 text-indigo-400"
-                      : "text-slate-500 hover:text-slate-300"
+                      ? "bg-primary/15 text-primary"
+                      : "text-on-surface-variant hover:text-on-surface"
                   }`}
                 >
                   {v}
@@ -224,15 +226,15 @@ export const WorkspacesPage = () => {
             </div>
 
             {/* Status Filters */}
-            <div className="flex items-center border border-slate-850 rounded-lg p-0.5 bg-slate-900/50">
+            <div className="flex items-center border border-outline-variant rounded-lg p-0.5 bg-surface-container">
               {["all", "active", "archived"].map((st) => (
                 <button
                   key={st}
                   onClick={() => updateParams({ status: st, page: 1 })}
                   className={`px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
                     statusParam === st
-                      ? "bg-indigo-600/10 text-indigo-400"
-                      : "text-slate-500 hover:text-slate-300"
+                      ? "bg-primary/15 text-primary"
+                      : "text-on-surface-variant hover:text-on-surface"
                   }`}
                 >
                   {st}
@@ -241,13 +243,13 @@ export const WorkspacesPage = () => {
             </div>
 
             {/* Grid/List Toggle */}
-            <div className="flex items-center border border-slate-850 rounded-lg p-0.5 bg-slate-900/50 shrink-0">
+            <div className="flex items-center border border-outline-variant rounded-lg p-0.5 bg-surface-container shrink-0">
               <button
                 onClick={() => updateParams({ view: "grid" })}
                 className={`p-1.5 rounded transition-all cursor-pointer ${
                   viewParam === "grid"
-                    ? "text-indigo-400 bg-indigo-600/10"
-                    : "text-slate-500 hover:text-slate-300"
+                    ? "text-primary bg-primary/15"
+                    : "text-on-surface-variant hover:text-on-surface"
                 }`}
                 title="Grid view"
               >
@@ -264,8 +266,8 @@ export const WorkspacesPage = () => {
                 onClick={() => updateParams({ view: "list" })}
                 className={`p-1.5 rounded transition-all cursor-pointer ${
                   viewParam === "list"
-                    ? "text-indigo-400 bg-indigo-600/10"
-                    : "text-slate-500 hover:text-slate-300"
+                    ? "text-primary bg-primary/15"
+                    : "text-on-surface-variant hover:text-on-surface"
                 }`}
                 title="List view"
               >
@@ -346,7 +348,7 @@ export const WorkspacesPage = () => {
                         </Badge>
                       )}
                     </div>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-[10px] text-muted">
                       Updated {formatDate(workspace.updatedAt)}
                     </span>
                   </div>
@@ -360,11 +362,13 @@ export const WorkspacesPage = () => {
               <div
                 key={workspace.id}
                 onClick={() => navigate(`/workspaces/${workspace.id}`)}
-                className="flex items-center justify-between p-5 rounded-2xl border border-slate-900 bg-slate-900/20 hover:bg-slate-900/40 hover:border-indigo-500/40 cursor-pointer transition-all"
+                className="flex items-center justify-between p-5 rounded-2xl border border-outline-variant bg-surface hover:bg-surface-container hover:border-primary/40 cursor-pointer transition-all shadow-sm"
               >
                 <div className="flex-1 min-w-0 pr-4">
-                  <h3 className="text-sm font-bold text-white mb-1.5 truncate">{workspace.name}</h3>
-                  <p className="text-xs text-slate-400 truncate">
+                  <h3 className="text-sm font-bold text-on-surface mb-1.5 truncate">
+                    {workspace.name}
+                  </h3>
+                  <p className="text-xs text-on-surface-variant truncate">
                     {workspace.description || "No description."}
                   </p>
                 </div>
@@ -382,7 +386,7 @@ export const WorkspacesPage = () => {
                       Archived
                     </Badge>
                   )}
-                  <span className="text-xs text-slate-500 hidden sm:inline">
+                  <span className="text-xs text-muted hidden sm:inline">
                     Created {formatDate(workspace.createdAt)}
                   </span>
                 </div>
@@ -411,7 +415,7 @@ export const WorkspacesPage = () => {
           }
           icon={
             <svg
-              className="h-12 w-12 text-slate-600"
+              className="h-12 w-12 text-muted"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -452,11 +456,11 @@ export const WorkspacesPage = () => {
             {...register("description")}
           />
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-slate-400 tracking-wide uppercase">
+            <label className="text-xs font-semibold text-on-surface-variant tracking-wide uppercase">
               Visibility
             </label>
             <select
-              className="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer"
+              className="w-full bg-surface border border-outline-variant text-on-surface rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all cursor-pointer"
               {...register("visibility")}
             >
               <option value={WorkspaceVisibility.PRIVATE}>Private (Invite Only)</option>

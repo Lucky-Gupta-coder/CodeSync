@@ -49,11 +49,11 @@ export const RoomListHeader: React.FC<RoomListHeaderProps> = ({
   }, [localSearch, search, onSearchChange]);
 
   return (
-    <div className="flex flex-col gap-4 bg-slate-900/30 border border-slate-850 p-4 rounded-2xl mb-6">
+    <div className="flex flex-col gap-4 bg-surface border border-outline-variant p-4 rounded-2xl mb-6 shadow-sm">
       {/* Top action row */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -69,7 +69,7 @@ export const RoomListHeader: React.FC<RoomListHeaderProps> = ({
             placeholder="Search rooms by name, description, language..."
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+            className="w-full pl-9 pr-4 py-2 bg-surface-container border border-outline-variant rounded-xl text-sm text-on-surface placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary transition-all"
           />
           {localSearch && (
             <button
@@ -77,7 +77,7 @@ export const RoomListHeader: React.FC<RoomListHeaderProps> = ({
                 setLocalSearch("");
                 onSearchChange("");
               }}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-on-surface-variant hover:text-on-surface"
               aria-label="Clear search"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,12 +94,12 @@ export const RoomListHeader: React.FC<RoomListHeaderProps> = ({
 
         <div className="flex items-center gap-2 justify-end">
           {/* View mode toggle */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 shrink-0">
+          <div className="flex items-center bg-surface-container p-1 rounded-xl border border-outline-variant shrink-0">
             <button
               onClick={() => onViewModeChange("grid")}
               title="Grid view"
-              className={`p-1.5 rounded-lg text-slate-400 transition-colors ${
-                viewMode === "grid" ? "bg-indigo-600/20 text-indigo-400" : "hover:text-white"
+              className={`p-1.5 rounded-lg text-on-surface-variant transition-colors ${
+                viewMode === "grid" ? "bg-primary/15 text-primary" : "hover:text-on-surface"
               }`}
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -114,8 +114,8 @@ export const RoomListHeader: React.FC<RoomListHeaderProps> = ({
             <button
               onClick={() => onViewModeChange("list")}
               title="List view"
-              className={`p-1.5 rounded-lg text-slate-400 transition-colors ${
-                viewMode === "list" ? "bg-indigo-600/20 text-indigo-400" : "hover:text-white"
+              className={`p-1.5 rounded-lg text-on-surface-variant transition-colors ${
+                viewMode === "list" ? "bg-primary/15 text-primary" : "hover:text-on-surface"
               }`}
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -136,15 +136,15 @@ export const RoomListHeader: React.FC<RoomListHeaderProps> = ({
       </div>
 
       {/* Filter and Sort row */}
-      <div className="flex flex-wrap items-center gap-3 text-xs pt-1 border-t border-slate-850">
+      <div className="flex flex-wrap items-center gap-3 text-xs pt-1 border-t border-outline-variant">
         {/* Status filter */}
         <div className="flex items-center gap-1.5">
-          <span className="text-slate-500 font-medium">Status:</span>
+          <span className="text-on-surface-variant font-medium">Status:</span>
           <select
             value={statusFilter}
             onChange={(e) => onStatusFilterChange(e.target.value)}
             aria-label="Filter by status"
-            className="bg-slate-950 border border-slate-800 text-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+            className="bg-surface border border-outline-variant text-on-surface rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
           >
             <option value="ALL">All Status</option>
             <option value="ACTIVE">Active</option>
@@ -154,12 +154,12 @@ export const RoomListHeader: React.FC<RoomListHeaderProps> = ({
 
         {/* Language filter */}
         <div className="flex items-center gap-1.5">
-          <span className="text-slate-500 font-medium">Language:</span>
+          <span className="text-on-surface-variant font-medium">Language:</span>
           <select
             value={languageFilter}
             onChange={(e) => onLanguageFilterChange(e.target.value)}
             aria-label="Filter by language"
-            className="bg-slate-950 border border-slate-800 text-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+            className="bg-surface border border-outline-variant text-on-surface rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
           >
             <option value="ALL">All Languages</option>
             {Object.values(RoomLanguage).map((lang) => (
@@ -172,12 +172,12 @@ export const RoomListHeader: React.FC<RoomListHeaderProps> = ({
 
         {/* Sort option */}
         <div className="flex items-center gap-1.5 ml-auto">
-          <span className="text-slate-500 font-medium">Sort by:</span>
+          <span className="text-on-surface-variant font-medium">Sort by:</span>
           <select
             value={sortBy}
             onChange={(e) => onSortByChange(e.target.value)}
             aria-label="Sort rooms"
-            className="bg-slate-950 border border-slate-800 text-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+            className="bg-surface border border-outline-variant text-on-surface rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
           >
             <option value="newest">Newest</option>
             <option value="oldest">Oldest</option>

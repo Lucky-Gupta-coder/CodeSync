@@ -9,17 +9,14 @@ export interface UIState {
   toggleSidebar: () => void;
 }
 
-// Read theme initial state safely from localStorage
 const getInitialTheme = (): "light" | "dark" => {
   if (typeof window !== "undefined") {
     const saved = localStorage.getItem("theme") as "light" | "dark";
-    if (saved === "light" || saved === "dark") {
-      // Apply theme class to document element on load
-      const root = window.document.documentElement;
-      root.classList.remove("light", "dark");
-      root.classList.add(saved);
-      return saved;
-    }
+    const theme = saved === "light" || saved === "dark" ? saved : "dark";
+    const root = window.document.documentElement;
+    root.classList.remove("light", "dark");
+    root.classList.add(theme);
+    return theme;
   }
   return "dark";
 };

@@ -4,6 +4,7 @@ import * as Y from "yjs";
 import { MonacoBinding } from "y-monaco";
 import { useRef, useEffect } from "react";
 import { PresenceUser, CursorPosition } from "@codesync/types";
+import { useUIStore } from "../../store/ui.store.js";
 
 export interface CodeEditorProps {
   value?: string;
@@ -26,6 +27,7 @@ export const CodeEditor = ({
   cursors = {},
   onCursorChange,
 }: CodeEditorProps) => {
+  const theme = useUIStore((state) => state.theme);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const bindingRef = useRef<MonacoBinding | null>(null);
   const monacoRef = useRef<Monaco | null>(null);
@@ -223,7 +225,7 @@ export const CodeEditor = ({
         height="100%"
         language={language}
         value={value}
-        theme="vs-dark"
+        theme={theme === "dark" ? "vs-dark" : "vs"}
         onChange={handleEditorChange}
         beforeMount={handleEditorWillMount}
         onMount={handleEditorDidMount}

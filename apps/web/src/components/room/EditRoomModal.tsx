@@ -61,12 +61,12 @@ export const EditRoomModal: React.FC<EditRoomModalProps> = ({
         />
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-slate-400 tracking-wide uppercase">
+          <label className="text-xs font-semibold text-on-surface-variant tracking-wide uppercase">
             Programming Language
           </label>
           <select
             aria-label="Programming Language"
-            className="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-950 transition-all cursor-pointer"
+            className="w-full bg-surface border border-outline-variant text-on-surface rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface transition-all cursor-pointer"
             {...register("language")}
           >
             {Object.values(RoomLanguage).map((lang) => (

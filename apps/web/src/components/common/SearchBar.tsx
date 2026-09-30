@@ -15,7 +15,7 @@ export const SearchBar = ({ value, onChange, placeholder = "Search..." }: Search
         placeholder={placeholder}
         className="pl-10"
       />
-      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-on-surface-variant">
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             strokeLinecap="round"

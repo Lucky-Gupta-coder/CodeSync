@@ -29,7 +29,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Overlay backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
@@ -37,14 +37,14 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
       <div
         role="dialog"
         aria-modal="true"
-        className="relative w-full max-w-md transform overflow-hidden rounded-2xl border border-slate-850 bg-slate-900 p-6 shadow-2xl transition-all z-10 animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md transform overflow-hidden rounded-2xl border border-outline-variant bg-surface p-6 shadow-xl transition-all z-10 animate-in fade-in zoom-in-95 duration-200"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-          <h3 className="text-lg font-bold text-white">{title}</h3>
+        <div className="flex items-center justify-between border-b border-outline-variant pb-4 mb-4">
+          <h3 className="text-lg font-bold text-on-surface">{title}</h3>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-all cursor-pointer"
+            className="rounded-lg p-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all cursor-pointer"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -58,7 +58,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
         </div>
 
         {/* Body */}
-        <div className="text-slate-300">{children}</div>
+        <div className="text-on-surface-variant">{children}</div>
       </div>
     </div>,
     document.body

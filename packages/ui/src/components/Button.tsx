@@ -16,14 +16,12 @@ export const Button: React.FC<ButtonProps> = ({
     "inline-flex items-center justify-center font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer duration-200";
 
   const variants = {
-    primary:
-      "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 focus:ring-indigo-500",
+    primary: "bg-primary hover:bg-primary-fixed-dim text-on-primary shadow-md focus:ring-primary",
     secondary:
-      "bg-slate-800 hover:bg-slate-700 text-slate-100 shadow-lg shadow-slate-900/20 focus:ring-slate-500",
+      "bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline-variant focus:ring-primary",
     outline:
-      "border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white focus:ring-slate-500",
-    danger:
-      "bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-500/20 focus:ring-rose-500",
+      "border border-outline-variant text-on-surface hover:bg-surface-container-high hover:text-on-surface focus:ring-primary",
+    danger: "bg-error hover:bg-error/90 text-on-error shadow-md focus:ring-error",
   };
 
   const sizes = {

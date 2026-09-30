@@ -10,20 +10,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full flex flex-col gap-1.5">
         {label && (
-          <label className="text-xs font-semibold text-slate-400 tracking-wide uppercase">
+          <label className="text-xs font-semibold text-on-surface-variant tracking-wide uppercase">
             {label}
           </label>
         )}
         <input
           ref={ref}
-          className={`w-full bg-slate-900 border ${
+          className={`w-full bg-surface border ${
             error
-              ? "border-red-500/80 focus:ring-red-500/80"
-              : "border-slate-800 focus:ring-indigo-500"
-          } text-slate-150 rounded-lg px-3.5 py-2.5 text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-950 transition-all ${className}`}
+              ? "border-error focus:ring-error"
+              : "border-outline focus:ring-primary focus:border-primary"
+          } text-on-surface rounded-lg px-3.5 py-2.5 text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface transition-all ${className}`}
           {...props}
         />
-        {error && <span className="text-xs font-medium text-red-400">{error}</span>}
+        {error && <span className="text-xs font-medium text-error">{error}</span>}
       </div>
     );
   }

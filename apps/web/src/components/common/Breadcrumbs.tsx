@@ -14,7 +14,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items }) => {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="flex items-center space-x-2 text-xs font-medium text-slate-400 my-2"
+      className="flex items-center space-x-2 text-xs font-medium text-on-surface-variant my-2"
     >
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
@@ -23,7 +23,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items }) => {
           <React.Fragment key={index}>
             {index > 0 && (
               <svg
-                className="h-3.5 w-3.5 text-slate-600 shrink-0"
+                className="h-3.5 w-3.5 text-muted shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -40,14 +40,14 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items }) => {
             {item.href && !isLast ? (
               <Link
                 to={item.href}
-                className="hover:text-slate-200 transition-colors truncate max-w-[150px] sm:max-w-[200px]"
+                className="hover:text-on-surface transition-colors truncate max-w-[150px] sm:max-w-[200px]"
               >
                 {item.label}
               </Link>
             ) : (
               <span
                 className={`truncate max-w-[150px] sm:max-w-[200px] ${
-                  isLast ? "text-slate-100 font-semibold" : "text-slate-400"
+                  isLast ? "text-on-surface font-semibold" : "text-on-surface-variant"
                 }`}
                 aria-current={isLast ? "page" : undefined}
               >
