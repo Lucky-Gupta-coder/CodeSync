@@ -20,10 +20,11 @@ export interface User {
   createdAt: string;
 }
 
-export enum UserRole {
-  MEMBER = "member",
-  ADMIN = "admin",
-}
+export const UserRole = {
+  MEMBER: "member",
+  ADMIN: "admin",
+} as const;
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 export interface UserResponseDTO {
   id: string;
@@ -45,34 +46,38 @@ export interface RegisterResponse {
   data: UserResponseDTO;
 }
 
-export enum WorkspaceVisibility {
-  PUBLIC = "PUBLIC",
-  PRIVATE = "PRIVATE",
-}
+export const WorkspaceVisibility = {
+  PUBLIC: "PUBLIC",
+  PRIVATE: "PRIVATE",
+} as const;
+export type WorkspaceVisibility = (typeof WorkspaceVisibility)[keyof typeof WorkspaceVisibility];
 
-export enum RoomLanguage {
-  JAVASCRIPT = "javascript",
-  TYPESCRIPT = "typescript",
-  JAVA = "java",
-  CPP = "cpp",
-  PYTHON = "python",
-  C = "c",
-  GO = "go",
-  RUST = "rust",
-}
+export const RoomLanguage = {
+  JAVASCRIPT: "javascript",
+  TYPESCRIPT: "typescript",
+  JAVA: "java",
+  CPP: "cpp",
+  PYTHON: "python",
+  C: "c",
+  GO: "go",
+  RUST: "rust",
+} as const;
+export type RoomLanguage = (typeof RoomLanguage)[keyof typeof RoomLanguage];
 
-export enum RoomStatus {
-  ACTIVE = "ACTIVE",
-  LOCKED = "LOCKED",
-  ARCHIVED = "ARCHIVED",
-}
+export const RoomStatus = {
+  ACTIVE: "ACTIVE",
+  LOCKED: "LOCKED",
+  ARCHIVED: "ARCHIVED",
+} as const;
+export type RoomStatus = (typeof RoomStatus)[keyof typeof RoomStatus];
 
-export enum MembershipRole {
-  OWNER = "OWNER",
-  ADMIN = "ADMIN",
-  EDITOR = "EDITOR",
-  VIEWER = "VIEWER",
-}
+export const MembershipRole = {
+  OWNER: "OWNER",
+  ADMIN: "ADMIN",
+  EDITOR: "EDITOR",
+  VIEWER: "VIEWER",
+} as const;
+export type MembershipRole = (typeof MembershipRole)[keyof typeof MembershipRole];
 
 export interface WorkspaceDTO {
   id: string;
@@ -104,10 +109,11 @@ export interface MembershipDTO {
   joinedAt: string;
 }
 
-export enum FileType {
-  FILE = "FILE",
-  FOLDER = "FOLDER",
-}
+export const FileType = {
+  FILE: "FILE",
+  FOLDER: "FOLDER",
+} as const;
+export type FileType = (typeof FileType)[keyof typeof FileType];
 
 export interface FileNodeDTO {
   id: string;

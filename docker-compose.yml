@@ -3,7 +3,7 @@ services:
     image: mongo:6.0
     container_name: codesync-mongodb
     restart: unless-stopped
-    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    command: [ "--replSet", "rs0", "--bind_ip_all", "--port", "27017" ]
     ports:
       - "27017:27017"
     volumes:
@@ -28,12 +28,16 @@ services:
     container_name: codesync-api
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      # Bind to localhost only – no external interface exposure needed for local benchmarking.
+      # Change to "5000:5000" only if another service on a different host requires direct access.
+      - "127.0.0.1:5000:5000"
     environment:
       - PORT=5000
-      - NODE_ENV=production
+      - NODE_ENV=development
       - MONGO_URI=mongodb://database:27017/codesync
-      - CORS_ORIGIN=http://localhost:5173
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:5173}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
     depends_on:
       - database
 

@@ -53,5 +53,14 @@ coverage/
 # Cache
 .eslintcache
 .parcel-cache
-.cache/
-.vite/
+# Performance test data & results
+performance/test-config.json
+performance/credentials.json
+performance/results.json
+performance/results/*.json
+
+# Local MongoDB/test cache
+apps/api/.mongo-cache/
+
+# Performance test artifacts
+performance/

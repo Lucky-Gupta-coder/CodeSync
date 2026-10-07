@@ -3,14 +3,15 @@ export interface WhiteboardPoint {
   y: number;
 }
 
-export enum WhiteboardTool {
-  SELECT = "SELECT",
-  PEN = "PEN",
-  LINE = "LINE",
-  RECTANGLE = "RECTANGLE",
-  ELLIPSE = "ELLIPSE",
-  ERASER = "ERASER",
-}
+export const WhiteboardTool = {
+  SELECT: "SELECT",
+  PEN: "PEN",
+  LINE: "LINE",
+  RECTANGLE: "RECTANGLE",
+  ELLIPSE: "ELLIPSE",
+  ERASER: "ERASER",
+} as const;
+export type WhiteboardTool = (typeof WhiteboardTool)[keyof typeof WhiteboardTool];
 
 export interface WhiteboardObjectBase {
   id: string;
